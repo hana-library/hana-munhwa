@@ -103,10 +103,6 @@
           <span>🔌</span>
           <span>공공 API · JSON 연동</span>
         </button>
-        <button id="openAddModalBtn" type="button" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-900 text-white hover:bg-slate-800 shadow-sm transition flex items-center gap-1.5">
-          <span>+</span>
-          <span>포스터 등록</span>
-        </button>
       </div>
     </div>
 
@@ -269,25 +265,8 @@
 
       <div class="grid grid-cols-1 md:grid-cols-12">
         <!-- 좌측 포스터 뷰어 -->
-        <div class="md:col-span-5 bg-slate-950 flex flex-col">
+        <div class="md:col-span-5 bg-slate-950 flex items-center justify-center">
           <div id="modalPosterBox" class="aspect-[3/4] w-full overflow-hidden relative flex items-center justify-center"></div>
-          <div class="p-3 bg-slate-900 text-[11px] text-slate-300 space-y-2 border-t border-slate-800">
-            <p class="font-bold text-white">🖼️ 공식 포스터 등록 · 교체 (Ctrl+V 붙여넣기 지원)</p>
-            <div class="flex gap-1.5">
-              <input id="modalPosterUrlInput" type="url" placeholder="공식 포스터 이미지 URL..." class="flex-1 px-2.5 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-white text-[11px] focus:outline-none" />
-              <button id="modalApplyPosterUrlBtn" type="button" class="px-2.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold shrink-0">적용</button>
-              <button id="modalClearPosterBtn" type="button" class="px-2 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-200 font-semibold shrink-0">초기화</button>
-            </div>
-            <div class="flex items-center justify-between gap-2 pt-0.5">
-              <label class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold cursor-pointer">
-                <span>📁 이미지 파일 첨부</span>
-                <input id="modalPosterFileInput" type="file" accept="image/*" class="hidden" />
-              </label>
-              <button id="modalFetchOgBtn" type="button" class="px-2.5 py-1 rounded-lg bg-emerald-900/80 hover:bg-emerald-800 text-emerald-200 font-semibold">
-                원본 페이지 추출
-              </button>
-            </div>
-          </div>
         </div>
 
         <!-- 우측 상세 정보 -->
@@ -373,89 +352,6 @@
           JSON 배열 병합하기
         </button>
       </div>
-    </div>
-  </div>
-
-  <!-- 새 포스터 직접 등록 모달 -->
-  <div id="addModal" class="hidden fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 space-y-4 my-auto">
-      <div class="flex items-center justify-between">
-        <h3 class="text-lg font-black text-slate-900">+ 새 문화예술 포스터 등록</h3>
-        <button id="closeAddModalBtn" type="button" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center font-bold text-sm">✕</button>
-      </div>
-
-      <form id="addEventForm" class="space-y-3 text-xs">
-        <div>
-          <label class="block font-bold text-slate-700 mb-1">전시 · 공연명 *</label>
-          <input id="addTitle" type="text" required placeholder="예: 낭만주의 거장 <차이코프스키 & 라흐마니노프>" class="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200" />
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-          <div class="sm:col-span-1">
-            <label class="block font-bold text-slate-700 mb-1">권역</label>
-            <select id="addRegion" class="w-full px-2.5 py-2 rounded-xl bg-slate-50 border border-slate-200">
-              <option value="서울">서울</option>
-              <option value="경기·인천">경기·인천</option>
-              <option value="강원">강원</option>
-              <option value="충청">충청</option>
-              <option value="전라">전라</option>
-              <option value="경상">경상</option>
-              <option value="제주">제주</option>
-            </select>
-          </div>
-          <div class="sm:col-span-2">
-            <label class="block font-bold text-slate-700 mb-1">장소 · 기관명 *</label>
-            <input id="addVenue" type="text" required placeholder="예: 예술의전당 콘서트홀" class="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200" />
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">장르</label>
-            <select id="addGenre" class="w-full px-2.5 py-2 rounded-xl bg-slate-50 border border-slate-200">
-              <option value="미술/전시">미술/전시</option>
-              <option value="클래식/음악">클래식/음악</option>
-              <option value="연극/뮤지컬">연극/뮤지컬</option>
-              <option value="무용/국악">무용/국악</option>
-              <option value="복합/페스티벌">복합/페스티벌</option>
-            </select>
-          </div>
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">시작일 *</label>
-            <input id="addStartDate" type="date" required class="w-full px-2.5 py-2 rounded-xl bg-slate-50 border border-slate-200" />
-          </div>
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">종료일 *</label>
-            <input id="addEndDate" type="date" required class="w-full px-2.5 py-2 rounded-xl bg-slate-50 border border-slate-200" />
-          </div>
-        </div>
-
-        <div>
-          <label class="block font-bold text-slate-700 mb-1">공식 상세 페이지 URL</label>
-          <div class="flex gap-2">
-            <input id="addSourceUrl" type="url" placeholder="https://www.sac.or.kr/..." class="flex-1 px-3 py-2 rounded-xl bg-slate-50 border border-slate-200" />
-            <button id="extractFromUrlBtn" type="button" class="px-3 py-2 rounded-xl bg-indigo-50 text-indigo-700 border border-indigo-200 font-bold shrink-0">
-              포스터 추출
-            </button>
-          </div>
-        </div>
-
-        <div>
-          <label class="block font-bold text-slate-700 mb-1">공식 포스터 이미지 URL</label>
-          <input id="addPosterUrl" type="url" placeholder="https://.../poster.jpg" class="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200" />
-        </div>
-
-        <div>
-          <label class="block font-bold text-slate-700 mb-1">간략 소개</label>
-          <textarea id="addDesc" rows="2" placeholder="공연 · 전시 프로그램 소개" class="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200"></textarea>
-        </div>
-
-        <div class="pt-2 flex justify-end gap-2">
-          <button type="submit" class="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold">
-            아카이브에 포스터 등록하기
-          </button>
-        </div>
-      </form>
     </div>
   </div>
 
@@ -1873,9 +1769,6 @@
         document.getElementById('modalCast').textContent = ev.cast || '공식 기관 제공';
         document.getElementById('modalDesc').textContent = ev.desc || '상세 프로그램 안내 및 예매 정보는 공식 원본 페이지에서 확인하실 수 있습니다.';
 
-        const currentPoster = state.posterCache[ev.id] || ev.posterUrl || '';
-        document.getElementById('modalPosterUrlInput').value = currentPoster.startsWith('data:') ? '' : currentPoster;
-
         const sourceLink = document.getElementById('modalSourceLink');
         sourceLink.href = ev.sourceUrl || '#';
         try {
@@ -2479,62 +2372,6 @@
           if (e.target.id === 'detailModal') closeDetailModal();
         });
 
-        document.getElementById('modalApplyPosterUrlBtn').addEventListener('click', () => {
-          if (!state.activeEventId) return;
-          const url = document.getElementById('modalPosterUrlInput').value.trim();
-          if (!url) {
-            showToast('포스터 이미지 URL을 입력해 주세요.', 'error');
-            return;
-          }
-          applyPosterToEvent(state.activeEventId, url);
-          showToast('공식 포스터 이미지가 적용되었습니다.', 'success');
-        });
-
-        document.getElementById('modalClearPosterBtn').addEventListener('click', () => {
-          if (!state.activeEventId) return;
-          document.getElementById('modalPosterUrlInput').value = '';
-          applyPosterToEvent(state.activeEventId, '');
-          showToast('등록된 포스터 이미지를 초기화했습니다.', 'info');
-        });
-
-        document.getElementById('modalPosterFileInput').addEventListener('change', (e) => {
-          const file = e.target.files?.[0];
-          if (!file || !state.activeEventId) return;
-          const reader = new FileReader();
-          reader.onload = () => {
-            applyPosterToEvent(state.activeEventId, String(reader.result));
-            showToast('첨부한 공식 포스터 파일이 등록되었습니다.', 'success');
-          };
-          reader.readAsDataURL(file);
-        });
-
-        document.getElementById('modalFetchOgBtn').addEventListener('click', () => {
-          if (!state.activeEventId) return;
-          const ev = state.events.find((item) => item.id === state.activeEventId);
-          if (ev) extractOfficialPosterForEvent(ev, false);
-        });
-
-        document.addEventListener('paste', (e) => {
-          if (!state.activeEventId || document.getElementById('detailModal').classList.contains('hidden')) return;
-          const items = e.clipboardData?.items;
-          if (!items) return;
-          for (const item of items) {
-            if (item.type.startsWith('image/')) {
-              const file = item.getAsFile();
-              if (file) {
-                const reader = new FileReader();
-                reader.onload = () => {
-                  applyPosterToEvent(state.activeEventId, String(reader.result));
-                  showToast('클립보드에서 복사한 공식 포스터가 즉시 등록되었습니다!', 'success');
-                };
-                reader.readAsDataURL(file);
-                e.preventDefault();
-                break;
-              }
-            }
-          }
-        });
-
         const apiModal = document.getElementById('apiModal');
         document.getElementById('openApiModalBtn').addEventListener('click', () => {
           document.getElementById('kopisKeyInput').value = safeStorage.get(STORAGE_KOPIS_KEY) || DEFAULT_KOPIS_KEY || '';
@@ -2633,89 +2470,6 @@
           } catch (err) {
             showToast(`JSON 오류: ${err.message}`, 'error');
           }
-        });
-
-        const addModal = document.getElementById('addModal');
-        document.getElementById('openAddModalBtn').addEventListener('click', () => {
-          const today = getTodayStr();
-          document.getElementById('addStartDate').value = today;
-          document.getElementById('addEndDate').value = today;
-          addModal.classList.remove('hidden');
-        });
-        document.getElementById('closeAddModalBtn').addEventListener('click', () => addModal.classList.add('hidden'));
-        addModal.addEventListener('click', (e) => {
-          if (e.target.id === 'addModal') addModal.classList.add('hidden');
-        });
-
-        document.getElementById('extractFromUrlBtn').addEventListener('click', async () => {
-          const url = document.getElementById('addSourceUrl').value.trim();
-          if (!url) {
-            showToast('원본 상세 페이지 URL을 먼저 입력해 주세요.', 'error');
-            return;
-          }
-          try {
-            const html = await fetchViaProxy(url);
-            const extracted = extractPosterFromHtml(html, url);
-            if (extracted) {
-              document.getElementById('addPosterUrl').value = extracted;
-              showToast('원본 페이지에서 공식 포스터 URL을 추출했습니다!', 'success');
-            } else {
-              showToast('포스터 메타 이미지를 찾지 못했습니다. 직접 이미지 주소를 입력해 주세요.', 'info');
-            }
-          } catch (e) {
-            showToast('기관 보안 정책으로 자동 추출이 제한됩니다.', 'error');
-          }
-        });
-
-        document.getElementById('addEventForm').addEventListener('submit', (e) => {
-          e.preventDefault();
-          const title = cleanEventTitle(document.getElementById('addTitle').value);
-          const venue = document.getElementById('addVenue').value.trim();
-          const region = document.getElementById('addRegion').value;
-          const genre = document.getElementById('addGenre').value;
-          const startDate = document.getElementById('addStartDate').value;
-          const endDate = document.getElementById('addEndDate').value;
-          const sourceUrl = document.getElementById('addSourceUrl').value.trim();
-          const posterUrl = document.getElementById('addPosterUrl').value.trim();
-          const desc = document.getElementById('addDesc').value.trim();
-
-          const newEv = {
-            id: `custom-${Date.now()}`,
-            title,
-            venue,
-            region,
-            genre,
-            startDate,
-            endDate: endDate || startDate,
-            price: '원본 페이지 확인',
-            cast: '직접 등록 아카이브',
-            desc,
-            posterUrl,
-            sourceUrl,
-            paletteIdx: state.events.length % PALETTES.length
-          };
-
-          if (posterUrl) {
-            state.posterCache[newEv.id] = posterUrl;
-            safeStorage.set(STORAGE_POSTER_CACHE_KEY, JSON.stringify(state.posterCache));
-          }
-
-          state.events.unshift(newEv);
-
-          let customList = [];
-          try {
-            customList = JSON.parse(safeStorage.get(STORAGE_CUSTOM_EVENTS_KEY) || '[]');
-            if (!Array.isArray(customList)) customList = [];
-          } catch (err) {
-            customList = [];
-          }
-          customList.unshift(newEv);
-          safeStorage.set(STORAGE_CUSTOM_EVENTS_KEY, JSON.stringify(customList));
-
-          e.target.reset();
-          addModal.classList.add('hidden');
-          renderAll();
-          showToast(`'${title}' 포스터가 아카이브에 등록되었습니다.`, 'success');
         });
 
         const policyModal = document.getElementById('policyModal');
