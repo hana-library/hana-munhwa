@@ -97,7 +97,7 @@
         </button>
         <button id="autoFetchPostersBtn" type="button" class="px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-xs font-bold bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200 transition flex items-center gap-1.5">
           <span>🔄</span>
-          <span id="autoFetchBtnLabel">실시간 공식 포스터 새로고침</span>
+          <span id="autoFetchBtnLabel">새로고침</span>
         </button>
       </div>
     </div>
@@ -111,9 +111,6 @@
         </div>
         <div class="flex items-center gap-3 text-slate-400 shrink-0">
           <span id="posterFetchedCount">실제 포스터 등록: 0건</span>
-          <button id="refreshLiveBtn" type="button" class="text-emerald-300 hover:text-emerald-200 underline font-semibold">
-            새로고침 동기화
-          </button>
         </div>
       </div>
     </div>
@@ -319,7 +316,7 @@
       <div class="space-y-3 text-xs text-slate-600 leading-relaxed">
         <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
           <p class="font-black text-slate-900">1. 공공데이터 출처 및 원문 연결 원칙</p>
-          <p>본 서비스는 예술경영지원센터 KOPIS 공연예술통합전산망 오픈API 및 각 국공립 미술관·박물관·공연장의 공개 일정을 안내하며, 모든 항목은 원본 상세·예매 페이지로 직접 연결됩니다.</p>
+          <p>본 서비스는 예술경영지원센터 KOPIS 공연예술통합전산망 공공데이터 및 각 국공립 미술관·박물관·공연장의 공개 일정을 안내하며, 모든 항목은 원본 상세·예매 페이지로 직접 연결됩니다.</p>
         </div>
         <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
           <p class="font-black text-slate-900">2. 공식 포스터 저작권 존중 및 무왜곡 표시</p>
@@ -1869,9 +1866,9 @@
         const autoFetchBtn = document.getElementById('autoFetchPostersBtn');
         const autoFetchLabel = document.getElementById('autoFetchBtnLabel');
         if (autoFetchBtn) autoFetchBtn.disabled = true;
-        if (autoFetchLabel) autoFetchLabel.textContent = '공식 포스터 동기화 중...';
+        if (autoFetchLabel) autoFetchLabel.textContent = '새로고침 중...';
         if (syncText) {
-          syncText.textContent = 'KOPIS 공연예술통합전산망에서 향후 150일(30일 구간 분할) 공식 포스터를 실시간 수집 중입니다...';
+          syncText.textContent = '전국 문화예술 공식 포스터 및 일정을 불러오는 중입니다...';
         }
 
         try {
@@ -1926,10 +1923,10 @@
 
           if (addedCount > 0 || posterUpdated > 0) {
             if (syncText) {
-              syncText.textContent = `KOPIS 공식 연동 완료 · 총 ${state.events.length}건 (공식 포스터 ${Object.keys(state.posterCache).length}건)`;
+              syncText.textContent = `전국 문화예술 아카이브 최신화 완료 · 총 ${state.events.length}건 (공식 포스터 ${Object.keys(state.posterCache).length}건)`;
             }
             if (!silent) {
-              showToast(`공식 일정 ${addedCount}건 · 공식 포스터 ${posterUpdated}건을 동기화했습니다!`, 'success');
+              showToast(`최신 일정 ${addedCount}건 · 공식 포스터 ${posterUpdated}건을 반영했습니다.`, 'success');
             }
           } else {
             const firstErr = settled.find((s) => s.status === 'rejected');
@@ -1938,17 +1935,17 @@
               syncText.textContent = `전국 실존 아카이브 ${state.events.length}건 · 공식 포스터 ${Object.keys(state.posterCache).length}건 (${reason})`;
             }
             if (!silent) {
-              showToast(`동기화 안내: ${reason}`, 'info');
+              showToast(`새로고침 안내: ${reason}`, 'info');
             }
           }
         } catch (err) {
           if (!silent) {
-            showToast(`동기화 오류: ${err.message || '네트워크 지연'}`, 'error');
+            showToast(`새로고침 오류: ${err.message || '네트워크 지연'}`, 'error');
           }
         } finally {
           state.isSyncingKopis = false;
           if (autoFetchBtn) autoFetchBtn.disabled = false;
-          if (autoFetchLabel) autoFetchLabel.textContent = '실시간 공식 포스터 새로고침';
+          if (autoFetchLabel) autoFetchLabel.textContent = '새로고침';
         }
       }
 
@@ -2135,14 +2132,14 @@
           }
           const syncText = document.getElementById('syncStatusText');
           if (syncText) {
-            syncText.textContent = `전국 실존 아카이브 ${state.events.length}건 · 공식 포스터 ${Object.keys(state.posterCache).length}건 실시간 동기화 완료`;
+            syncText.textContent = `전국 실존 아카이브 ${state.events.length}건 · 공식 포스터 ${Object.keys(state.posterCache).length}건 최신화 완료`;
           }
           if (!silent) {
-            showToast(`동기화 완료 · 전체 ${state.events.length}건 (공식 포스터 ${Object.keys(state.posterCache).length}건)`, 'success');
+            showToast(`새로고침 완료 · 전체 ${state.events.length}건 (공식 포스터 ${Object.keys(state.posterCache).length}건)`, 'success');
           }
         } catch (e) {
           if (!silent) {
-            showToast('추가 피드 동기화를 완료했습니다.', 'info');
+            showToast('추가 일정 새로고침을 완료했습니다.', 'info');
           }
         } finally {
           state.isFetchingPosters = false;
@@ -2284,7 +2281,6 @@
           syncLivePublicAtlas(!DEFAULT_KOPIS_KEY);
         };
         document.getElementById('autoFetchPostersBtn').addEventListener('click', triggerFullSync);
-        document.getElementById('refreshLiveBtn').addEventListener('click', triggerFullSync);
 
         document.getElementById('closeDetailModalBtn').addEventListener('click', closeDetailModal);
         document.getElementById('detailModal').addEventListener('click', (e) => {
@@ -2314,9 +2310,8 @@
         if (params.get('policy') === '1' || window.location.hash === '#policy') {
           document.getElementById('policyModal').classList.remove('hidden');
         }
-        const queryKey = params.get('kopis') || DEFAULT_KOPIS_KEY || '';
-        if (queryKey) {
-          syncKopisLiveData(queryKey, false);
+        if (DEFAULT_KOPIS_KEY) {
+          syncKopisLiveData(DEFAULT_KOPIS_KEY, false);
         }
 
         syncLivePublicAtlas(true);
