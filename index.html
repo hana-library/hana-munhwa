@@ -71,49 +71,45 @@
 </head>
 <body class="min-h-screen flex flex-col">
 
-  <!-- 상단 고정 헤더 -->
-  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-3">
+  <!-- 상단 고정 헤더 및 통합 검색·지역·장르 필터 바 -->
+  <header id="stickyTopHeader" class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 transition-shadow">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 sm:py-3 flex flex-wrap items-center justify-between gap-2.5">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-900 via-indigo-950 to-emerald-900 text-white flex items-center justify-center font-black text-sm tracking-tighter shadow-sm">
+        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-slate-900 via-indigo-950 to-emerald-900 text-white flex items-center justify-center font-black text-xs sm:text-sm tracking-tighter shadow-sm">
           HANA
         </div>
         <div>
           <div class="flex items-center gap-2">
-            <h1 class="text-lg sm:text-xl font-black tracking-tight text-slate-900">HANA된 문화 예술</h1>
+            <h1 class="text-base sm:text-xl font-black tracking-tight text-slate-900">HANA된 문화 예술</h1>
             <span id="liveDateBadge" class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
               실시간 기준
             </span>
           </div>
-          <p class="text-xs text-slate-500">전국 미술관 · 박물관 · 공연장 공식 포스터 아틀라스</p>
+          <p class="hidden sm:block text-xs text-slate-500">전국 미술관 · 박물관 · 공연장 공식 포스터 아틀라스</p>
         </div>
       </div>
 
       <!-- 우측 액션 버튼 -->
       <div class="flex flex-wrap items-center gap-2">
-        <button id="openPolicyModalBtn" type="button" class="px-3 py-2 rounded-xl text-xs font-bold bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 transition flex items-center gap-1.5">
+        <button id="openPolicyModalBtn" type="button" class="px-3 py-1.5 sm:py-2 rounded-xl text-xs font-bold bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 transition flex items-center gap-1.5">
           <span>📋</span>
           <span>운영 · 저작권 정책</span>
         </button>
-        <button id="autoFetchPostersBtn" type="button" class="px-3 py-2 rounded-xl text-xs font-bold bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200 transition flex items-center gap-1.5">
-          <span>🖼️</span>
-          <span>실시간 공식 포스터 동기화</span>
-        </button>
-        <button id="openApiModalBtn" type="button" class="px-3 py-2 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition flex items-center gap-1.5">
-          <span>🔌</span>
-          <span>공공 API · JSON 연동</span>
+        <button id="autoFetchPostersBtn" type="button" class="px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-xs font-bold bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200 transition flex items-center gap-1.5">
+          <span>🔄</span>
+          <span id="autoFetchBtnLabel">실시간 공식 포스터 새로고침</span>
         </button>
       </div>
     </div>
 
     <!-- 상태 피드 배너 -->
-    <div id="syncStatusBar" class="bg-slate-900 text-slate-200 text-[11px] px-4 py-1.5">
+    <div id="syncStatusBar" class="bg-slate-900 text-slate-200 text-[11px] px-4 py-1">
       <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
-        <div class="flex items-center gap-2">
-          <span id="syncDot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-          <span id="syncStatusText">전국 실존 문화예술 아카이브 로드 완료 · 오늘 날짜 기준 자동 정렬됨</span>
+        <div class="flex items-center gap-2 min-w-0">
+          <span id="syncDot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
+          <span id="syncStatusText" class="truncate">전국 실존 문화예술 아카이브 로드 완료 · 오늘 날짜 기준 자동 정렬됨</span>
         </div>
-        <div class="flex items-center gap-3 text-slate-400">
+        <div class="flex items-center gap-3 text-slate-400 shrink-0">
           <span id="posterFetchedCount">실제 포스터 등록: 0건</span>
           <button id="refreshLiveBtn" type="button" class="text-emerald-300 hover:text-emerald-200 underline font-semibold">
             새로고침 동기화
@@ -121,96 +117,99 @@
         </div>
       </div>
     </div>
+
+    <!-- 상단 고정 검색 · 정렬 · 권역 · 장르 필터 패널 -->
+    <div class="bg-white/95 border-t border-slate-100">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 sm:py-3 space-y-2">
+        <!-- 1행: 검색어 + 정렬 + 상태 + 실제포스터 필터 + 뷰 전환 -->
+        <div class="flex flex-col lg:flex-row gap-2 items-stretch lg:items-center justify-between">
+          <div class="relative flex-1">
+            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs sm:text-sm">🔍</span>
+            <input
+              id="searchInput"
+              type="text"
+              placeholder="전시명, 공연명, 미술관·공연장, 출연진 또는 지역 검색..."
+              class="w-full pl-9 pr-4 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm font-medium text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition"
+            />
+          </div>
+
+          <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+            <select id="sortSelect" class="px-2.5 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 focus:outline-none shrink-0">
+              <option value="nearest">오늘 기준 가까운 날짜순</option>
+              <option value="startAsc">개막일 빠른순</option>
+              <option value="endAsc">마감 임박순</option>
+              <option value="startDesc">최신 개막순</option>
+            </select>
+
+            <select id="statusSelect" class="px-2.5 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 focus:outline-none shrink-0">
+              <option value="ALL">전체 일정 상태</option>
+              <option value="WITHIN_60">오늘부터 60일 이내</option>
+              <option value="ONGOING">현재 진행중</option>
+              <option value="UPCOMING">개막 예정</option>
+              <option value="ENDED">종료된 일정</option>
+            </select>
+
+            <label class="inline-flex items-center gap-1.5 px-2.5 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 cursor-pointer select-none shrink-0">
+              <input id="onlyPosterCheck" type="checkbox" class="rounded text-indigo-600 focus:ring-indigo-500" />
+              <span>공식 포스터만</span>
+            </label>
+
+            <div class="inline-flex p-0.5 rounded-xl bg-slate-100 border border-slate-200/80 shrink-0">
+              <button id="viewWallBtn" type="button" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-white text-slate-900 shadow-sm">
+                포스터 월
+              </button>
+              <button id="viewDirBtn" type="button" class="px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-600">
+                월별 일정표
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2행: 권역 탭 -->
+        <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+          <button type="button" data-region="ALL" class="region-btn px-3 py-1 rounded-full text-xs font-bold bg-slate-900 text-white shrink-0">전국 전체</button>
+          <button type="button" data-region="서울" class="region-btn px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0">서울</button>
+          <button type="button" data-region="경기·인천" class="region-btn px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0">경기·인천</button>
+          <button type="button" data-region="강원" class="region-btn px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0">강원</button>
+          <button type="button" data-region="충청" class="region-btn px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0">충청</button>
+          <button type="button" data-region="전라" class="region-btn px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0">전라</button>
+          <button type="button" data-region="경상" class="region-btn px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0">경상</button>
+          <button type="button" data-region="제주" class="region-btn px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0">제주</button>
+        </div>
+
+        <!-- 3행: 장르 탭 -->
+        <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-1.5 border-t border-slate-100">
+          <button type="button" data-genre="ALL" class="genre-btn px-3 py-1 rounded-lg text-xs font-bold bg-indigo-600 text-white shrink-0">전체 장르</button>
+          <button type="button" data-genre="미술/전시" class="genre-btn px-3 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0">미술/전시</button>
+          <button type="button" data-genre="클래식/음악" class="genre-btn px-3 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0">클래식/음악</button>
+          <button type="button" data-genre="연극/뮤지컬" class="genre-btn px-3 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0">연극/뮤지컬</button>
+          <button type="button" data-genre="무용/국악" class="genre-btn px-3 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0">무용/국악</button>
+          <button type="button" data-genre="복합/페스티벌" class="genre-btn px-3 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0">복합/페스티벌</button>
+        </div>
+      </div>
+    </div>
   </header>
 
   <!-- 메인 콘텐츠 -->
-  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 space-y-6">
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-5 space-y-5">
 
     <!-- 상단 요약 지표 -->
     <section class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-      <div class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-sm">
+      <div class="bg-white rounded-2xl border border-slate-200/80 p-3.5 sm:p-4 shadow-sm">
         <p class="text-[11px] font-bold text-slate-400">전체 아카이브</p>
         <p id="statTotal" class="text-xl sm:text-2xl font-black text-slate-900 mt-1">0건</p>
       </div>
-      <div class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-sm">
+      <div class="bg-white rounded-2xl border border-slate-200/80 p-3.5 sm:p-4 shadow-sm">
         <p class="text-[11px] font-bold text-emerald-600">현재 진행중</p>
         <p id="statOngoing" class="text-xl sm:text-2xl font-black text-emerald-700 mt-1">0건</p>
       </div>
-      <div class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-sm">
+      <div class="bg-white rounded-2xl border border-slate-200/80 p-3.5 sm:p-4 shadow-sm">
         <p class="text-[11px] font-bold text-indigo-600">개막 예정</p>
         <p id="statUpcoming" class="text-xl sm:text-2xl font-black text-indigo-700 mt-1">0건</p>
       </div>
-      <div class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-sm">
+      <div class="bg-white rounded-2xl border border-slate-200/80 p-3.5 sm:p-4 shadow-sm">
         <p class="text-[11px] font-bold text-slate-400">현재 필터 결과</p>
         <p id="statFiltered" class="text-xl sm:text-2xl font-black text-slate-900 mt-1">0건</p>
-      </div>
-    </section>
-
-    <!-- 검색 · 정렬 · 권역 · 장르 필터 패널 -->
-    <section class="bg-white rounded-2xl border border-slate-200/80 p-4 sm:p-5 shadow-sm space-y-4">
-      <!-- 1행: 검색어 + 정렬 + 상태 + 실제포스터 필터 + 뷰 전환 -->
-      <div class="flex flex-col lg:flex-row gap-3 items-stretch lg:items-center justify-between">
-        <div class="relative flex-1">
-          <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm">🔍</span>
-          <input
-            id="searchInput"
-            type="text"
-            placeholder="전시명, 공연명, 미술관·공연장, 출연진 또는 지역 검색..."
-            class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm font-medium text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition"
-          />
-        </div>
-
-        <div class="flex flex-wrap items-center gap-2">
-          <select id="sortSelect" class="px-3 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 focus:outline-none">
-            <option value="nearest">오늘 기준 가까운 날짜순</option>
-            <option value="startAsc">개막일 빠른순</option>
-            <option value="endAsc">마감 임박순</option>
-            <option value="startDesc">최신 개막순</option>
-          </select>
-
-          <select id="statusSelect" class="px-3 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 focus:outline-none">
-            <option value="ALL">전체 일정 상태</option>
-            <option value="ONGOING">현재 진행중</option>
-            <option value="UPCOMING">개막 예정</option>
-            <option value="ENDED">종료된 일정</option>
-          </select>
-
-          <label class="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 cursor-pointer select-none">
-            <input id="onlyPosterCheck" type="checkbox" class="rounded text-indigo-600 focus:ring-indigo-500" />
-            <span>공식 포스터만</span>
-          </label>
-
-          <div class="inline-flex p-1 rounded-xl bg-slate-100 border border-slate-200/80">
-            <button id="viewWallBtn" type="button" class="px-2.5 py-1 rounded-md text-xs font-bold bg-white text-slate-900 shadow-sm">
-              포스터 월
-            </button>
-            <button id="viewDirBtn" type="button" class="px-2.5 py-1 rounded-md text-xs font-semibold text-slate-600">
-              월별 일정표
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- 2행: 권역 탭 -->
-      <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
-        <button type="button" data-region="ALL" class="region-btn px-3.5 py-1.5 rounded-full text-xs font-bold bg-slate-900 text-white shrink-0">전국 전체</button>
-        <button type="button" data-region="서울" class="region-btn px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0">서울</button>
-        <button type="button" data-region="경기·인천" class="region-btn px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0">경기·인천</button>
-        <button type="button" data-region="강원" class="region-btn px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0">강원</button>
-        <button type="button" data-region="충청" class="region-btn px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0">충청</button>
-        <button type="button" data-region="전라" class="region-btn px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0">전라</button>
-        <button type="button" data-region="경상" class="region-btn px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0">경상</button>
-        <button type="button" data-region="제주" class="region-btn px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0">제주</button>
-      </div>
-
-      <!-- 3행: 장르 탭 -->
-      <div class="flex flex-wrap items-center gap-1.5 pt-2 border-t border-slate-100">
-        <button type="button" data-genre="ALL" class="genre-btn px-3 py-1 rounded-lg text-xs font-bold bg-indigo-600 text-white">전체 장르</button>
-        <button type="button" data-genre="미술/전시" class="genre-btn px-3 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200">미술/전시</button>
-        <button type="button" data-genre="클래식/음악" class="genre-btn px-3 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200">클래식/음악</button>
-        <button type="button" data-genre="연극/뮤지컬" class="genre-btn px-3 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200">연극/뮤지컬</button>
-        <button type="button" data-genre="무용/국악" class="genre-btn px-3 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200">무용/국악</button>
-        <button type="button" data-genre="복합/페스티벌" class="genre-btn px-3 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200">복합/페스티벌</button>
       </div>
     </section>
 
@@ -242,14 +241,14 @@
       </div>
       <div class="flex items-center gap-4">
         <button id="footerPolicyBtn" type="button" class="underline hover:text-slate-900 font-semibold">
-          데이터 출처 · 저작권 · API 운영 정책
+          데이터 출처 · 저작권 · 운영 정책
         </button>
         <span>출처: KOPIS 공연예술통합전산망 · 각 국공립 문화기관</span>
       </div>
     </div>
   </footer>
 
-  <!-- 상세 보기 및 공식 포스터 등록/교체 모달 -->
+  <!-- 상세 보기 모달 -->
   <div id="detailModal" class="hidden fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
     <div class="bg-white rounded-3xl max-w-3xl w-full overflow-hidden shadow-2xl border border-slate-200 my-auto">
       <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
@@ -310,56 +309,11 @@
     </div>
   </div>
 
-  <!-- 공공 API · XML · JSON 연동 모달 -->
-  <div id="apiModal" class="hidden fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-    <div class="bg-white rounded-3xl max-w-xl w-full p-6 shadow-2xl border border-slate-200 space-y-5 my-auto">
-      <div class="flex items-center justify-between">
-        <div>
-          <h3 class="text-lg font-black text-slate-900">🔌 KOPIS 공공 API · JSON 연동</h3>
-          <p class="text-xs text-slate-500">공연예술통합전산망(KOPIS) 오픈API 인증키 또는 JSON 데이터로 공식 포스터를 일괄 연동합니다.</p>
-        </div>
-        <button id="closeApiModalBtn" type="button" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center font-bold text-sm">✕</button>
-      </div>
-
-      <div class="space-y-2 bg-indigo-50/70 p-4 rounded-2xl border border-indigo-100">
-        <label for="kopisKeyInput" class="block text-xs font-black text-indigo-950">1. KOPIS 오픈API 서비스 인증키</label>
-        <div class="flex gap-2">
-          <input id="kopisKeyInput" type="text" placeholder="KOPIS 인증키 32자리 입력" class="flex-1 px-3 py-2 rounded-xl bg-white border border-indigo-200 text-xs font-mono text-slate-900 focus:outline-none" />
-          <button id="syncKopisBtn" type="button" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shrink-0">
-            실시간 수집
-          </button>
-        </div>
-        <p class="text-[11px] text-indigo-700/80">※ 30일 단위 구간 · 다중 페이지 분할 조회로 최대 500건의 실제 공연과 공식 포스터를 한 번에 가져옵니다.</p>
-      </div>
-
-      <div class="space-y-2">
-        <label for="kopisRawXmlTextarea" class="block text-xs font-bold text-slate-700">2. KOPIS XML 응답 직접 붙여넣기 (방화벽 환경 대안)</label>
-        <textarea id="kopisRawXmlTextarea" rows="3" placeholder="<dbs><db>...</db></dbs> 형태의 KOPIS API XML 응답을 붙여넣으면 즉시 파싱됩니다." class="w-full p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-mono focus:outline-none"></textarea>
-        <button id="parseKopisXmlBtn" type="button" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold">
-          XML 파싱 및 반영
-        </button>
-      </div>
-
-      <div class="pt-3 border-t border-slate-100 space-y-2">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-bold text-slate-700">3. 아카이브 JSON 백업 / 복원 (`events.json`)</span>
-          <button id="exportJsonBtn" type="button" class="px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold hover:bg-emerald-100">
-            현재 전체 JSON 내보내기
-          </button>
-        </div>
-        <textarea id="importJsonTextarea" rows="2" placeholder='[{"title":"...","venue":"...","posterUrl":"https://..."}]' class="w-full p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-mono focus:outline-none"></textarea>
-        <button id="importJsonBtn" type="button" class="px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold">
-          JSON 배열 병합하기
-        </button>
-      </div>
-    </div>
-  </div>
-
   <!-- 데이터 · 저작권 · 운영 정책 모달 -->
   <div id="policyModal" class="hidden fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
     <div class="bg-white rounded-3xl max-w-xl w-full p-6 shadow-2xl border border-slate-200 space-y-4 my-auto">
       <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-        <h3 class="text-lg font-black text-slate-900">📋 데이터 출처 · 저작권 · API 운영 정책</h3>
+        <h3 class="text-lg font-black text-slate-900">📋 데이터 출처 · 저작권 · 운영 정책</h3>
         <button id="closePolicyModalBtn" type="button" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center font-bold text-sm">✕</button>
       </div>
       <div class="space-y-3 text-xs text-slate-600 leading-relaxed">
@@ -369,31 +323,44 @@
         </div>
         <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
           <p class="font-black text-slate-900">2. 공식 포스터 저작권 존중 및 무왜곡 표시</p>
-          <p>모든 포스터 이미지의 저작권은 원 주최·제작사 및 해당 문화기관에 귀속됩니다. 임의 합성 이미지를 사용하지 않으며, 미수신 시 정갈한 에디토리얼 타이포그래피 카드로 대체 표시합니다.</p>
+          <p>모든 공식 포스터 및 홍보 이미지의 저작권은 각 원저작권자(주최·주관 기관 및 제작사)에 있으며, 임의 변형·편집 없이 원본 비율 그대로 표시됩니다. 공식 포스터가 미수신된 일정은 타이포그래피 카드로 대체됩니다.</p>
         </div>
         <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
-          <p class="font-black text-slate-900">3. 기준일 자동 정렬 및 클라이언트 저장 정책</p>
-          <p>사용자 접속 시점의 오늘 날짜를 기준으로 진행중·개막 임박 일정을 자동 우선 정렬하며, 사용자가 등록한 포스터 캐시는 브라우저 로컬 스토리지에만 보관됩니다.</p>
+          <p class="font-black text-slate-900">3. 기준일 자동 갱신 및 데이터 안내</p>
+          <p>접속 시점의 오늘 날짜를 기준으로 진행중·개막예정 일정이 자동 정렬되며, 상세 관람 시간·휴관일·예매 잔여석은 각 공식 기관 원문 페이지에서 최종 확인해 주시기 바랍니다.</p>
         </div>
       </div>
-      <button id="confirmPolicyModalBtn" type="button" class="w-full py-2.5 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800">
-        확인
-      </button>
+      <div class="pt-2 flex justify-end">
+        <button id="confirmPolicyModalBtn" type="button" class="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition">
+          확인
+        </button>
+      </div>
     </div>
   </div>
 
+  <!-- 맨 위로 가기 플로팅 버튼 -->
+  <button
+    id="scrollToTopBtn"
+    type="button"
+    aria-label="맨 위로 이동"
+    title="맨 위로 이동"
+    class="hidden fixed bottom-5 right-5 z-40 w-11 h-11 rounded-full bg-slate-900/95 hover:bg-indigo-600 text-white shadow-xl border border-white/15 backdrop-blur-sm flex items-center justify-center transition-all duration-200 hover:-translate-y-0.5 active:scale-95"
+  >
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" />
+    </svg>
+  </button>
+
   <!-- 우측 하단 알림 토스트 컨테이너 -->
-  <div id="toastBox" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm pointer-events-none"></div>
+  <div id="toastBox" class="fixed bottom-20 right-5 z-50 flex flex-col gap-2 max-w-sm pointer-events-none"></div>
 
   <script>
     (function () {
       'use strict';
 
-      // 사용자 제공 KOPIS 인증키 및 스토리지 키 설정
+      // KOPIS 오픈API 자동 연동 설정 (UI 비노출)
       const DEFAULT_KOPIS_KEY = '984a1700a3e040c0a7ae5082f86f9b93';
-      const STORAGE_KOPIS_KEY = 'hana_culture_kopis_key_v1';
       const STORAGE_POSTER_CACHE_KEY = 'hana_culture_poster_cache_v3';
-      const STORAGE_CUSTOM_EVENTS_KEY = 'hana_culture_custom_events_v1';
 
       // 공식 포스터 미수신 시 표시할 에디토리얼 타이포그래피 팔레트
       const PALETTES = [
@@ -1393,7 +1360,7 @@
         return candidate;
       }
 
-      // 1. 초기 아카이브 및 사용자 저장 데이터 로드
+      // 1. 초기 아카이브 및 포스터 캐시 로드
       function loadInitialEvents() {
         try {
           const rawCache = safeStorage.get(STORAGE_POSTER_CACHE_KEY);
@@ -1407,23 +1374,10 @@
           state.posterCache = {};
         }
 
-        let customEvents = [];
-        try {
-          const rawCustom = safeStorage.get(STORAGE_CUSTOM_EVENTS_KEY);
-          if (rawCustom) {
-            const parsedCustom = JSON.parse(rawCustom);
-            if (Array.isArray(parsedCustom)) {
-              customEvents = parsedCustom;
-            }
-          }
-        } catch (e) {
-          customEvents = [];
-        }
-
         const merged = [];
         const seenIds = new Set();
 
-        [...customEvents, ...CURATED_EVENTS].forEach((ev, idx) => {
+        CURATED_EVENTS.forEach((ev, idx) => {
           if (!ev || !ev.title) return;
           const id = ev.id || `evt-${idx}-${Date.now()}`;
           if (seenIds.has(id)) return;
@@ -1553,7 +1507,14 @@
           if (state.genreFilter !== 'ALL' && ev.genre !== state.genreFilter) return false;
 
           const status = getEventStatus(ev);
-          if (state.statusFilter !== 'ALL' && status.code !== state.statusFilter) return false;
+          if (state.statusFilter === 'WITHIN_60') {
+            const startMs = parseDateMs(ev.startDate);
+            const endMs = parseDateMs(ev.endDate || ev.startDate);
+            const max60Ms = todayMs + 60 * 86400000;
+            if (todayMs > endMs || startMs > max60Ms) return false;
+          } else if (state.statusFilter !== 'ALL' && status.code !== state.statusFilter) {
+            return false;
+          }
 
           const hasPoster = Boolean(state.posterCache[ev.id] || ev.posterUrl);
           if (state.onlyPoster && !hasPoster) return false;
@@ -1747,7 +1708,7 @@
         }
       }
 
-      // 8. 상세 모달 제어 및 포스터 교체
+      // 8. 상세 모달 제어
       function openDetailModal(eventId) {
         const ev = state.events.find((e) => e.id === eventId);
         if (!ev) return;
@@ -1783,24 +1744,6 @@
       function closeDetailModal() {
         state.activeEventId = null;
         document.getElementById('detailModal').classList.add('hidden');
-      }
-
-      function applyPosterToEvent(eventId, posterDataOrUrl) {
-        const ev = state.events.find((e) => e.id === eventId);
-        if (!ev) return;
-
-        ev.posterUrl = posterDataOrUrl;
-        if (posterDataOrUrl) {
-          state.posterCache[ev.id] = posterDataOrUrl;
-        } else {
-          delete state.posterCache[ev.id];
-        }
-        safeStorage.set(STORAGE_POSTER_CACHE_KEY, JSON.stringify(state.posterCache));
-
-        if (state.activeEventId === ev.id) {
-          document.getElementById('modalPosterBox').innerHTML = renderPosterVisual(ev, true);
-        }
-        renderAll();
       }
 
       // 9. 프록시 HTML/XML 로더 (HTTP/HTTPS 이중 우회 지원)
@@ -1861,50 +1804,6 @@
         return Promise.any(wrapped);
       }
 
-      function extractPosterFromHtml(html, baseUrl) {
-        try {
-          const doc = new DOMParser().parseFromString(html, 'text/html');
-          const ogImg = doc.querySelector('meta[property="og:image"], meta[name="og:image"], meta[name="twitter:image"]');
-          if (ogImg) {
-            const unwrapped = unwrapPosterUrl(ogImg.getAttribute('content'), baseUrl);
-            if (unwrapped) return unwrapped;
-          }
-          const imgs = Array.from(doc.querySelectorAll('img'));
-          for (const img of imgs) {
-            const src = img.getAttribute('src') || img.getAttribute('data-src') || '';
-            const alt = (img.getAttribute('alt') || '').toLowerCase();
-            const unwrapped = unwrapPosterUrl(src, baseUrl);
-            if (unwrapped && (/pfmPoster|poster|atchFile|file\/image|culture\.go\.kr/i.test(unwrapped) || alt.includes('포스터'))) {
-              return unwrapped;
-            }
-          }
-        } catch (e) {
-          // 무시
-        }
-        return '';
-      }
-
-      async function extractOfficialPosterForEvent(ev, silent = true) {
-        if (!ev || !ev.sourceUrl) return '';
-        try {
-          const html = await fetchViaProxy(ev.sourceUrl);
-          const posterUrl = extractPosterFromHtml(html, ev.sourceUrl);
-          if (posterUrl) {
-            applyPosterToEvent(ev.id, posterUrl);
-            if (!silent) {
-              showToast(`원본 페이지에서 공식 포스터를 추출했습니다: ${ev.title}`, 'success');
-            }
-            return posterUrl;
-          }
-        } catch (e) {
-          // 기관 보안 차단 시 안내
-        }
-        if (!silent) {
-          showToast('기관 보안 정책으로 자동 추출이 제한됩니다. 원본 페이지에서 이미지 복사 후 Ctrl+V로 등록해 주세요.', 'error');
-        }
-        return '';
-      }
-
       // 10. KOPIS 오픈API XML 파싱 및 30일 단위 분할 다중 페이지 수집
       function parseKopisXmlText(rawText) {
         let xmlText = String(rawText || '').trim();
@@ -1962,22 +1861,17 @@
 
       async function syncKopisLiveData(serviceKey, silent = false) {
         const key = String(serviceKey || '').trim();
-        if (!key) {
-          if (!silent) showToast('KOPIS 서비스 인증키를 입력해 주세요.', 'error');
-          return;
-        }
+        if (!key) return;
         if (state.isSyncingKopis) return;
         state.isSyncingKopis = true;
-        safeStorage.set(STORAGE_KOPIS_KEY, key);
 
         const syncText = document.getElementById('syncStatusText');
-        const syncBtn = document.getElementById('syncKopisBtn');
-        if (syncBtn) {
-          syncBtn.disabled = true;
-          syncBtn.textContent = '수집 중...';
-        }
+        const autoFetchBtn = document.getElementById('autoFetchPostersBtn');
+        const autoFetchLabel = document.getElementById('autoFetchBtnLabel');
+        if (autoFetchBtn) autoFetchBtn.disabled = true;
+        if (autoFetchLabel) autoFetchLabel.textContent = '공식 포스터 동기화 중...';
         if (syncText) {
-          syncText.textContent = 'KOPIS 공연예술통합전산망에서 30일 구간 · 다중 페이지 공식 포스터를 실시간 수집 중입니다...';
+          syncText.textContent = 'KOPIS 공연예술통합전산망에서 향후 150일(30일 구간 분할) 공식 포스터를 실시간 수집 중입니다...';
         }
 
         try {
@@ -1987,7 +1881,9 @@
             { st: addDaysStr(now, 0), ed: addDaysStr(now, 30), page: 2, rows: 100 },
             { st: addDaysStr(now, 31), ed: addDaysStr(now, 60), page: 1, rows: 100 },
             { st: addDaysStr(now, 31), ed: addDaysStr(now, 60), page: 2, rows: 100 },
-            { st: addDaysStr(now, 61), ed: addDaysStr(now, 90), page: 1, rows: 100 }
+            { st: addDaysStr(now, 61), ed: addDaysStr(now, 90), page: 1, rows: 100 },
+            { st: addDaysStr(now, 91), ed: addDaysStr(now, 120), page: 1, rows: 100 },
+            { st: addDaysStr(now, 121), ed: addDaysStr(now, 150), page: 1, rows: 100 }
           ];
 
           const requests = queries.map(async (q) => {
@@ -2033,9 +1929,8 @@
               syncText.textContent = `KOPIS 공식 연동 완료 · 총 ${state.events.length}건 (공식 포스터 ${Object.keys(state.posterCache).length}건)`;
             }
             if (!silent) {
-              showToast(`KOPIS에서 공연 ${addedCount}건 · 공식 포스터 ${posterUpdated}건을 연동했습니다!`, 'success');
+              showToast(`공식 일정 ${addedCount}건 · 공식 포스터 ${posterUpdated}건을 동기화했습니다!`, 'success');
             }
-            document.getElementById('apiModal').classList.add('hidden');
           } else {
             const firstErr = settled.find((s) => s.status === 'rejected');
             const reason = firstErr ? firstErr.reason?.message || '응답 없음' : '조회된 공연 없음';
@@ -2043,19 +1938,17 @@
               syncText.textContent = `전국 실존 아카이브 ${state.events.length}건 · 공식 포스터 ${Object.keys(state.posterCache).length}건 (${reason})`;
             }
             if (!silent) {
-              showToast(`KOPIS 응답 지연: ${reason}`, 'info');
+              showToast(`동기화 안내: ${reason}`, 'info');
             }
           }
         } catch (err) {
           if (!silent) {
-            showToast(`KOPIS 연동 오류: ${err.message || '네트워크 지연'}`, 'error');
+            showToast(`동기화 오류: ${err.message || '네트워크 지연'}`, 'error');
           }
         } finally {
           state.isSyncingKopis = false;
-          if (syncBtn) {
-            syncBtn.disabled = false;
-            syncBtn.textContent = '실시간 수집';
-          }
+          if (autoFetchBtn) autoFetchBtn.disabled = false;
+          if (autoFetchLabel) autoFetchLabel.textContent = '실시간 공식 포스터 새로고침';
         }
       }
 
@@ -2317,9 +2210,9 @@
           btn.addEventListener('click', () => {
             state.regionFilter = btn.getAttribute('data-region');
             document.querySelectorAll('.region-btn').forEach((b) => {
-              b.className = 'region-btn px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0';
+              b.className = 'region-btn px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0';
             });
-            btn.className = 'region-btn px-3.5 py-1.5 rounded-full text-xs font-bold bg-slate-900 text-white shrink-0';
+            btn.className = 'region-btn px-3 py-1 rounded-full text-xs font-bold bg-slate-900 text-white shrink-0';
             renderAll();
           });
         });
@@ -2328,9 +2221,9 @@
           btn.addEventListener('click', () => {
             state.genreFilter = btn.getAttribute('data-genre');
             document.querySelectorAll('.genre-btn').forEach((b) => {
-              b.className = 'genre-btn px-3 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200';
+              b.className = 'genre-btn px-3 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0';
             });
-            btn.className = 'genre-btn px-3 py-1 rounded-lg text-xs font-bold bg-indigo-600 text-white';
+            btn.className = 'genre-btn px-3 py-1 rounded-lg text-xs font-bold bg-indigo-600 text-white shrink-0';
             renderAll();
           });
         });
@@ -2346,23 +2239,49 @@
           document.getElementById('onlyPosterCheck').checked = false;
           document.querySelectorAll('.region-btn').forEach((b, i) => {
             b.className = i === 0
-              ? 'region-btn px-3.5 py-1.5 rounded-full text-xs font-bold bg-slate-900 text-white shrink-0'
-              : 'region-btn px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0';
+              ? 'region-btn px-3 py-1 rounded-full text-xs font-bold bg-slate-900 text-white shrink-0'
+              : 'region-btn px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0';
           });
           document.querySelectorAll('.genre-btn').forEach((b, i) => {
             b.className = i === 0
-              ? 'genre-btn px-3 py-1 rounded-lg text-xs font-bold bg-indigo-600 text-white'
-              : 'genre-btn px-3 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200';
+              ? 'genre-btn px-3 py-1 rounded-lg text-xs font-bold bg-indigo-600 text-white shrink-0'
+              : 'genre-btn px-3 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0';
           });
           renderAll();
         });
 
-        const triggerFullSync = () => {
-          const activeKey = safeStorage.get(STORAGE_KOPIS_KEY) || DEFAULT_KOPIS_KEY;
-          if (activeKey) {
-            syncKopisLiveData(activeKey, false);
+        // 맨 위로 가기 버튼 및 스크롤 시 상단 바 그림자 처리
+        const scrollToTopBtn = document.getElementById('scrollToTopBtn');
+        const stickyHeader = document.getElementById('stickyTopHeader');
+        window.addEventListener('scroll', () => {
+          const y = window.scrollY || document.documentElement.scrollTop;
+          if (scrollToTopBtn) {
+            if (y > 280) {
+              scrollToTopBtn.classList.remove('hidden');
+            } else {
+              scrollToTopBtn.classList.add('hidden');
+            }
           }
-          syncLivePublicAtlas(!activeKey);
+          if (stickyHeader) {
+            if (y > 16) {
+              stickyHeader.classList.add('shadow-md');
+            } else {
+              stickyHeader.classList.remove('shadow-md');
+            }
+          }
+        }, { passive: true });
+
+        if (scrollToTopBtn) {
+          scrollToTopBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          });
+        }
+
+        const triggerFullSync = () => {
+          if (DEFAULT_KOPIS_KEY) {
+            syncKopisLiveData(DEFAULT_KOPIS_KEY, false);
+          }
+          syncLivePublicAtlas(!DEFAULT_KOPIS_KEY);
         };
         document.getElementById('autoFetchPostersBtn').addEventListener('click', triggerFullSync);
         document.getElementById('refreshLiveBtn').addEventListener('click', triggerFullSync);
@@ -2370,106 +2289,6 @@
         document.getElementById('closeDetailModalBtn').addEventListener('click', closeDetailModal);
         document.getElementById('detailModal').addEventListener('click', (e) => {
           if (e.target.id === 'detailModal') closeDetailModal();
-        });
-
-        const apiModal = document.getElementById('apiModal');
-        document.getElementById('openApiModalBtn').addEventListener('click', () => {
-          document.getElementById('kopisKeyInput').value = safeStorage.get(STORAGE_KOPIS_KEY) || DEFAULT_KOPIS_KEY || '';
-          apiModal.classList.remove('hidden');
-        });
-        document.getElementById('closeApiModalBtn').addEventListener('click', () => apiModal.classList.add('hidden'));
-        apiModal.addEventListener('click', (e) => {
-          if (e.target.id === 'apiModal') apiModal.classList.add('hidden');
-        });
-
-        document.getElementById('syncKopisBtn').addEventListener('click', () => {
-          const key = document.getElementById('kopisKeyInput').value.trim();
-          syncKopisLiveData(key, false);
-        });
-
-        document.getElementById('parseKopisXmlBtn').addEventListener('click', () => {
-          const rawXml = document.getElementById('kopisRawXmlTextarea').value.trim();
-          if (!rawXml) {
-            showToast('KOPIS XML 내용을 붙여넣어 주세요.', 'error');
-            return;
-          }
-          try {
-            const parsed = parseKopisXmlText(rawXml);
-            const existingIds = new Set(state.events.map((e) => e.id));
-            let added = 0;
-            parsed.forEach((item) => {
-              if (item.posterUrl) state.posterCache[item.id] = item.posterUrl;
-              if (!existingIds.has(item.id)) {
-                existingIds.add(item.id);
-                state.events.unshift(item);
-                added++;
-              }
-            });
-            safeStorage.set(STORAGE_POSTER_CACHE_KEY, JSON.stringify(state.posterCache));
-            renderAll();
-            apiModal.classList.add('hidden');
-            showToast(`XML에서 공연 ${added}건을 아카이브에 반영했습니다.`, 'success');
-          } catch (err) {
-            showToast(`XML 파싱 오류: ${err.message}`, 'error');
-          }
-        });
-
-        document.getElementById('exportJsonBtn').addEventListener('click', () => {
-          const payload = state.events.map((ev) => ({
-            ...ev,
-            posterUrl: state.posterCache[ev.id] || ev.posterUrl || ''
-          }));
-          const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `hana-culture-events-${getTodayStr()}.json`;
-          a.click();
-          URL.revokeObjectURL(url);
-        });
-
-        document.getElementById('importJsonBtn').addEventListener('click', () => {
-          const raw = document.getElementById('importJsonTextarea').value.trim();
-          if (!raw) {
-            showToast('JSON 데이터를 입력해 주세요.', 'error');
-            return;
-          }
-          try {
-            const arr = JSON.parse(raw);
-            if (!Array.isArray(arr)) throw new Error('JSON 최상위는 배열([])이어야 합니다.');
-            const existingIds = new Set(state.events.map((e) => e.id));
-            let added = 0;
-            arr.forEach((item, idx) => {
-              if (!item || !item.title) return;
-              const id = item.id || `import-${Date.now()}-${idx}`;
-              if (existingIds.has(id)) return;
-              existingIds.add(id);
-              const posterUrl = item.posterUrl || '';
-              if (posterUrl) state.posterCache[id] = posterUrl;
-              state.events.unshift({
-                id,
-                title: cleanEventTitle(item.title),
-                venue: item.venue || '공식 기관',
-                region: item.region || inferRegionFromText(`${item.title} ${item.venue || ''}`),
-                genre: item.genre || inferGenreFromText(item.title),
-                startDate: item.startDate || getTodayStr(),
-                endDate: item.endDate || item.startDate || getTodayStr(),
-                price: item.price || '원본 페이지 확인',
-                cast: item.cast || '공식 기관 제공',
-                desc: item.desc || '',
-                posterUrl,
-                sourceUrl: item.sourceUrl || 'https://www.kopis.or.kr/',
-                paletteIdx: idx % PALETTES.length
-              });
-              added++;
-            });
-            safeStorage.set(STORAGE_POSTER_CACHE_KEY, JSON.stringify(state.posterCache));
-            renderAll();
-            apiModal.classList.add('hidden');
-            showToast(`JSON에서 ${added}건의 일정을 아카이브에 병합했습니다.`, 'success');
-          } catch (err) {
-            showToast(`JSON 오류: ${err.message}`, 'error');
-          }
         });
 
         const policyModal = document.getElementById('policyModal');
@@ -2495,7 +2314,7 @@
         if (params.get('policy') === '1' || window.location.hash === '#policy') {
           document.getElementById('policyModal').classList.remove('hidden');
         }
-        const queryKey = params.get('kopis') || safeStorage.get(STORAGE_KOPIS_KEY) || DEFAULT_KOPIS_KEY || '';
+        const queryKey = params.get('kopis') || DEFAULT_KOPIS_KEY || '';
         if (queryKey) {
           syncKopisLiveData(queryKey, false);
         }
