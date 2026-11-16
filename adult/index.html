@@ -84,12 +84,6 @@ footer a{color:var(--accent)}
 .copybox textarea{width:100%;height:160px;font:12px/1.4 ui-monospace,monospace;border:1px solid var(--line);border-radius:6px;padding:8px;background:var(--bg);color:var(--ink)}
 .book{display:flex;gap:12px;align-items:flex-start}
 .book .bi{min-width:0;flex:1}
-.cv{flex:0 0 58px;width:58px;height:84px;border-radius:4px;overflow:hidden;background:var(--accent-soft);border:1px solid var(--line);display:block;box-shadow:0 1px 3px rgba(20,50,100,.12)}
-.cv img{width:100%;height:100%;object-fit:cover;display:block}
-.cv.nocv{box-shadow:none;background:repeating-linear-gradient(135deg,var(--accent-soft),var(--accent-soft) 6px,transparent 6px,transparent 12px)}
-a.cv:hover{outline:2px solid var(--accent)}
-.covernote{font-size:12px;color:var(--sub);margin:-6px 0 12px}
-.covernote a{color:var(--accent)}
 button.copy{font:inherit;font-size:13px;border:1px solid var(--accent);color:var(--accent);background:transparent;padding:6px 11px;border-radius:8px;cursor:pointer}
 </style>
 <style>/* 세 페이지 공통 폭: 문화행사 기준 1280px, 좌우 여백 휴대폰 16px · 그 이상 24px */@media (min-width:640px){header,.controls-inner,main,footer,.hb-nav .hb-in{padding-left:24px;padding-right:24px}}</style>
@@ -123,7 +117,6 @@ button.copy{font:inherit;font-size:13px;border:1px solid var(--accent);color:var
 
 <main>
   <div class="copybar"><p class="count" id="count"></p><span style="display:flex;gap:6px;flex-wrap:wrap"><button class="copy" id="xlsxBtn">⬇ 엑셀 파일(.xlsx) 받기</button><button class="copy" id="copyBtn">📋 엑셀용으로 목록 복사</button></span></div>
-  <p class="covernote" id="coverNote" hidden></p>
   <p id="copyMsg" class="copymsg"></p>
   <div id="copyBox" class="copybox" hidden><p>자동 복사가 막힌 환경입니다. 아래 칸이 모두 선택되어 있으니 <b>Ctrl+C</b>(맥은 <b>⌘+C</b>)로 복사해 엑셀 첫 칸에 붙여넣으세요. <button class="copy" id="copyClose">닫기</button></p><textarea id="copyArea" readonly></textarea></div>
   <div id="out"></div>
@@ -148,7 +141,7 @@ button.copy{font:inherit;font-size:13px;border:1px solid var(--accent);color:var
     <h3>저작자 표시 및 라이선스</h3>
     <p><b>© 2026 <a class="author mail" href="#" title="제작자에게 메일 보내기">libraryviolin</a></b> · 이 페이지의 구성, 장르 분류, 편집과 화면 디자인은 libraryviolin이 만들었습니다.</p>
     <p>이 페이지의 편집물은 <a href="https://creativecommons.org/licenses/by-nc/4.0/deed.ko" target="_blank" rel="noopener">크리에이티브 커먼즈 저작자표시-비영리 4.0 국제 라이선스(CC BY-NC 4.0)</a>에 따라 이용할 수 있습니다. 출처(libraryviolin, 「전국 공공도서관 사서추천도서 한눈에 보기 — 성인편」)를 밝히면 비영리 목적으로 자유롭게 복사·공유·수정할 수 있으며, 영리 목적으로 쓰려면 별도로 허락을 받아야 합니다(문의는 위 libraryviolin을 눌러 주세요).</p>
-    <p>각 추천 목록의 선정과 큐레이션 주제는 해당 도서관의 것입니다. 책 표지 이미지는 국립중앙도서관 ISBN 서지정보 API로 불러와 보여 주는 것으로, 저작권은 각 출판사와 저작자에게 있으며 이 페이지의 라이선스가 적용되지 않습니다. 책 소개는 싣지 않았으니 추천 사유와 자세한 내용은 각 도서관의 원문 링크에서 확인해 주세요. 이 라이선스는 각 도서관과 출판사의 저작물에는 적용되지 않습니다.</p>
+    <p>각 추천 목록의 선정과 큐레이션 주제는 해당 도서관의 것입니다. 책 소개는 싣지 않았으니 추천 사유와 자세한 내용은 각 도서관의 원문 링크에서 확인해 주세요. 이 라이선스는 각 도서관과 출판사의 저작물에는 적용되지 않습니다.</p>
   </div>
 </footer>
 
@@ -476,7 +469,7 @@ function render(){
     $("out").innerHTML=order.map(id=>{const c=CUR.find(x=>x.id===id);return `<section class="cur">
       <div class="cur-head">${isNew(c)?'<span class="new">NEW</span>':""}<h2>${esc(c.lib)}</h2><span class="tag">${c.month.slice(0,4)}.${c.month.slice(5)}</span><span class="tag aud">${KIND_LABEL[c.kind]}</span>${c.aud==="전연령"?'<span class="tag">전 연령 혼합</span>':""}<span class="meta">${esc(c.region)} · ${esc(c.theme)}</span>
       <a href="${c.url}" target="_blank" rel="noopener">${esc(c.urlLabel)} ↗</a></div>
-      <div class="books">${byCur.get(id).map(r=>`<div class="book">${coverHtml(r)}<div class="bi"><div class="t">${esc(r.title)}${r.sub?`<small>${esc(r.sub)}</small>`:""}</div>
+      <div class="books">${byCur.get(id).map(r=>`<div class="book"><div class="bi"><div class="t">${esc(r.title)}${r.sub?`<small>${esc(r.sub)}</small>`:""}</div>
       <div class="a">${esc(r.author)} · ${esc(r.pub)}${r.year?" · "+r.year:""}</div>
       <div class="x"><span class="tag g">${esc(r.genre)}${r.gsub?" · "+esc(r.gsub):""}</span>${r.field?`<span class="tag">${esc(r.field)}</span>`:""}${dupBadge(r)}</div></div></div>`).join("")}</div></section>`}).join("");
   }else{
@@ -502,26 +495,6 @@ menu.querySelector(".mm-copy").onclick=async()=>{const m=menu.querySelector(".mm
 document.querySelectorAll("a.mail").forEach(a=>a.addEventListener("click",e=>{e.preventDefault();e.stopPropagation();if(!menu.hidden&&menu._a===a){menu.hidden=true;return}menu._a=a;menu.querySelector(".mm-msg").textContent="";const r=a.getBoundingClientRect();menu.style.top=(window.scrollY+r.bottom+6)+"px";menu.style.left=Math.max(8,Math.min(window.scrollX+r.left,window.scrollX+document.documentElement.clientWidth-250))+"px";menu.hidden=false;}));
 document.addEventListener("click",e=>{if(!menu.hidden&&!menu.contains(e.target))menu.hidden=true});})();
 $("copyClose").onclick=()=>{$("copyBox").hidden=true};
-// 표지: GitHub Actions가 알라딘 OpenAPI로 찾아 covers.json에 저장해 둔 주소를 씁니다.
-// 열쇠는 scripts/covers.mjs의 coverKey와 똑같아야 합니다(서명 + 출판사, norm 적용).
-let COVERS={};
-const coverKey=r=>norm(String(r.title).split(/\s*[:：]\s*/)[0])+"|"+norm(r.pub||"");
-let HAS_COVERS=false;
-const okCover=u=>/^https:\/\/[a-z0-9.-]*nl\.go\.kr\//i.test(u||"");
-function coverHtml(r){
-  if(!HAS_COVERS)return "";
-  const c=COVERS[coverKey(r)];
-  if(!c||!okCover(c.cover))return '<span class="cv nocv" aria-hidden="true"></span>';
-  const img=`<img src="${esc(c.cover)}" alt="『${esc(r.title)}』 표지" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.className='cv nocv';this.remove()">`;
-  return okCover(c.link)?`<a class="cv" href="${esc(c.link)}" target="_blank" rel="noopener" title="국립중앙도서관에서 『${esc(r.title)}』 찾아보기">${img}</a>`:`<span class="cv">${img}</span>`;
-}
-fetch("covers.json",{cache:"no-cache"}).then(res=>res.ok?res.json():null).then(d=>{
-  if(!d||!d.items)return;
-  COVERS=d.items;HAS_COVERS=Object.values(COVERS).some(c=>okCover(c.cover));
-  if(!HAS_COVERS)return;
-  const n=$("coverNote");n.innerHTML='표지 이미지: <a href="https://www.nl.go.kr/seoji/" target="_blank" rel="noopener">국립중앙도서관 ISBN 서지정보</a> 제공 · 서명과 출판사가 정확히 일치하는 책만 표지를 붙였고, 표지가 등록되지 않은 책은 빈칸으로 둡니다.';n.hidden=false;
-  render();
-}).catch(()=>{});
 
 $("xlsxBtn").onclick=async()=>{
   const btn=$("xlsxBtn");btn.disabled=true;const old=btn.textContent;btn.textContent="파일 만드는 중…";
