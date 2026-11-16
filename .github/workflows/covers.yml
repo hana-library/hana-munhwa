@@ -25,9 +25,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: 알라딘에서 표지 찾기
+      - name: 국립중앙도서관에서 표지 찾기
         env:
-          ALADIN_TTB_KEY: ${{ secrets.ALADIN_TTB_KEY }}
+          NL_CERT_KEY: ${{ secrets.NL_CERT_KEY }}
         run: node scripts/covers.mjs
       - name: 바뀐 내용이 있으면 저장소에 올리기
         run: |
