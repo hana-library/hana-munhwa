@@ -14,7 +14,7 @@ const CERT_KEY = (process.env.NL_CERT_KEY || '').trim();
 const SOURCE = '국립중앙도서관 ISBN 서지정보 API';
 const MAX_CALLS = Number(process.env.MAX_CALLS || 1500);
 const RETRY_MISS_DAYS = 30;
-const SCRIPT_VERSION = 2; // 바꾸면 '못 찾은 책'을 모두 다시 조회
+const SCRIPT_VERSION = 3; // 바꾸면 '못 찾은 책'을 모두 다시 조회
 
 // ── 페이지와 똑같은 정규화 (adult/index.html의 norm, coverKey와 반드시 같아야 함) ──
 const norm = (s) => String(s).replace(/[\s()·,.:?!\-–—『』「」]/g, '').toLowerCase();
@@ -23,10 +23,16 @@ const coverKey = (title, pub) => norm(mainTitle(title)) + '|' + norm(pub || '');
 
 // 출판사 비교: 괄호 안 표기를 빼고, 한쪽이 다른 쪽을 포함하면 같은 출판사로 봅니다. (예: 롱블랙(타임앤코) ↔ 롱블랙)
 const pubCore = (p) => norm(String(p || '').replace(/\([^)]*\)/g, '').replace(/^(주식회사|\(주\)|㈜)\s*/, ''));
+// 국립중앙도서관 자료는 'Holidaybooks(홀리데이북스)', 'Our Media(아워미디어) :메타미디어월드'처럼
+// 영문 표기 + 괄호 안 한글 표기로 적힌 경우가 많아, 괄호 안 표기와 ':' 앞뒤 표기도 각각 비교합니다.
+const pubVariants = (p) => {
+  const raw = String(p || '');
+  const parts = [raw, raw.replace(/\([^)]*\)/g, ''), ...(raw.match(/\(([^)]*)\)/g) || []).map((m) => m.slice(1, -1)), ...raw.split(/\s*:\s*/)];
+  return [...new Set(parts.map((x) => pubCore(x)).filter((x) => x.length >= 2))];
+};
 const samePublisher = (a, b) => {
-  const x = pubCore(a), y = pubCore(b);
-  if (!x || !y) return false;
-  return x === y || (x.length >= 2 && y.includes(x)) || (y.length >= 2 && x.includes(y));
+  const xs = pubVariants(a), ys = pubVariants(b);
+  return xs.some((x) => ys.some((y) => x === y || y.includes(x) || x.includes(y)));
 };
 // 저자 비교(출판사가 없을 때만): 첫 저자 이름이 API 저자 칸에 들어 있는지
 const firstAuthor = (a) => norm(String(a || '').split(/\s*[\/·,]\s*|\s+(?:외|글|그림|지음|엮음|편)(?=\s|$|·)/)[0]);
