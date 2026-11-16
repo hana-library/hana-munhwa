@@ -31,6 +31,7 @@ const pubVariants = (p) => {
   return [...new Set(parts.map((x) => pubCore(x)).filter((x) => x.length >= 2))];
 };
 const samePublisher = (a, b) => {
+  if (pubCore(a) && pubCore(a) === pubCore(b)) return true; // '달'처럼 한 글자 출판사
   const xs = pubVariants(a), ys = pubVariants(b);
   return xs.some((x) => ys.some((y) => x === y || y.includes(x) || x.includes(y)));
 };
