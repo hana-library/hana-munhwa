@@ -14,7 +14,7 @@ const CERT_KEY = (process.env.NL_CERT_KEY || '').trim();
 const SOURCE = '국립중앙도서관 ISBN 서지정보 API';
 const MAX_CALLS = Number(process.env.MAX_CALLS || 1500);
 const RETRY_MISS_DAYS = 30;
-const SCRIPT_VERSION = 3; // 바꾸면 '못 찾은 책'을 모두 다시 조회
+const SCRIPT_VERSION = 4; // 바꾸면 '못 찾은 책'을 모두 다시 조회
 
 // ── 페이지와 똑같은 정규화 (adult/index.html의 norm, coverKey와 반드시 같아야 함) ──
 const norm = (s) => String(s).replace(/[\s()·,.:?!\-–—『』「」]/g, '').toLowerCase();
@@ -38,7 +38,7 @@ const samePublisher = (a, b) => {
 // 저자 비교(출판사가 없을 때만): 첫 저자 이름이 API 저자 칸에 들어 있는지
 const firstAuthor = (a) => norm(String(a || '').split(/\s*[\/·,]\s*|\s+(?:외|글|그림|지음|엮음|편)(?=\s|$|·)/)[0]);
 // API 서명 비교용: 부제(: 또는 " - " 뒤)를 뗀 본서명
-const apiMain = (t) => norm(String(t || '').split(/\s+-\s+/)[0].split(/\s*[:：=]\s*/)[0]);
+const apiMain = (t) => norm(String(t || '').replace(/^\s*\([^)]*\)\s*/, '').split(/\s+-\s+/)[0].split(/\s*[:：=]\s*/)[0]);
 
 async function readBooks() {
   const html = await readFile(PAGE, 'utf8');
@@ -117,12 +117,15 @@ function pickMatch(book, docs) {
   const withCover = docs.filter((d) => normalizeCoverUrl(d.TITLE_URL));
   const sameTitle = withCover.filter((d) => apiMain(d.TITLE) === want);
   let matched, by;
+  const fa = firstAuthor(book.author);
+  const sameAuthor = (d) => fa.length >= 2 && norm(d.AUTHOR).includes(fa);
   if (book.pub) {
     matched = sameTitle.filter((d) => samePublisher(book.pub, d.PUBLISHER));
     by = '서명+출판사';
+    // 출판 브랜드(임프린트)와 회사명이 다르게 적힌 경우(예: 엘릭시르↔문학동네): 서명+저자가 같으면 같은 책으로 봄
+    if (!matched.length) { matched = sameTitle.filter(sameAuthor); by = '서명+저자(출판사 표기 다름)'; }
   } else {
-    const fa = firstAuthor(book.author);
-    matched = fa.length >= 2 ? sameTitle.filter((d) => norm(d.AUTHOR).includes(fa)) : [];
+    matched = sameTitle.filter(sameAuthor);
     by = '서명+저자';
   }
   if (!matched.length) return null;
