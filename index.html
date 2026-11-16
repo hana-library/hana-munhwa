@@ -587,18 +587,32 @@
           const res = await fetch('./events.json', { cache: 'no-cache' });
           if (!res.ok) throw new Error(`events.json ${res.status}`);
           const data = await res.json();
-          const list = Array.isArray(data) ? data : Array.isArray(data?.events) ? data.events : [];
+          let list = Array.isArray(data) ? data : Array.isArray(data?.events) ? data.events : [];
+
+          // 「전국 도서관 행사 지도」(매월 25일, 출처를 하나씩 확인한 도서관 행사)를 '도서관/강연'으로 함께 보여 줌.
+          // 같은 행사가 두 곳에 있으면 행사 지도 쪽을 남기도록 먼저 넣는다.
+          try {
+            const lr = await fetch('./library-events.json', { cache: 'no-cache' });
+            if (lr.ok) {
+              const ld = await lr.json();
+              if (Array.isArray(ld?.events)) list = [...ld.events, ...list];
+            }
+          } catch (e) { /* 행사 지도 자료가 없으면 수집 자료만 */ }
 
           const keyOf = (e) => `${String(e.title || '').replace(/\s+/g, '')}|${String(e.venue || '').replace(/\s+/g, '').slice(0, 12)}`;
+          const libTitleKey = (e) => (e.genre === '도서관/강연' ? String(e.title || '').replace(/^\[[^\]]*\]\s*/, '').replace(/[\s'"‘’“”「」『』《》<>〈〉()\[\]]/g, '') : '');
           const existingIds = new Set(state.events.map((e) => e.id));
           const existingKeys = new Set(state.events.map(keyOf));
+          const libTitles = new Set(state.events.map(libTitleKey).filter(Boolean));
           let added = 0;
           list.forEach((item, idx) => {
             if (!item || !item.title) return;
             const id = item.id || `json-${idx}-${item.title.slice(0, 8)}`;
-            if (existingIds.has(id) || existingKeys.has(keyOf(item))) return;
+            const lt = libTitleKey(item);
+            if (existingIds.has(id) || existingKeys.has(keyOf(item)) || (lt && libTitles.has(lt))) return;
             existingIds.add(id);
             existingKeys.add(keyOf(item));
+            if (lt) libTitles.add(lt);
             const posterUrl = item.posterUrl || state.posterCache[id] || '';
             state.events.push({
               id,
@@ -939,6 +953,7 @@
         document.getElementById('modalPeriod').textContent = formatPeriod(ev.startDate, ev.endDate);
         document.getElementById('modalPrice').textContent = ev.price || '원본 페이지 확인';
         document.getElementById('modalCast').textContent = ev.cast || '공식 기관 제공';
+        document.getElementById('modalDesc').style.whiteSpace = 'pre-line';
         document.getElementById('modalDesc').textContent = ev.desc || '상세 프로그램 안내 및 예매 정보는 공식 원본 페이지에서 확인하실 수 있습니다.';
 
         const sourceLink = document.getElementById('modalSourceLink');
