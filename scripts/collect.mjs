@@ -233,7 +233,8 @@ function parseKopisXmlText(rawText) {
       title: prfnm,
       venue,
       region: inferRegionFromText(`${area} ${venue}`),
-      genre: inferGenreFromText(`${genrenm} ${prfnm} ${venue}`),
+      // [수집 스크립트 수정] 공연장 이름(예: ○○도서관 공연장)이 장르를 '도서관/강연'으로 바꾸지 않도록 KOPIS 장르명과 공연명만 본다
+    genre: inferGenreFromText(`${genrenm} ${prfnm}`),
       startDate: startRaw || getTodayStr(),
       endDate: endRaw || startRaw || getTodayStr(),
       price: 'KOPIS · 예매처 확인',
@@ -413,7 +414,8 @@ function extractDatePairFromText(text) {
     const d2 = String(dt.getDate()).padStart(2, '0');
     return [`${year}-${m1}-${d1}`, `${y2}-${m2}-${d2}`];
   }
-  return [getTodayStr(), addDaysStr(new Date(), 30).replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3')];
+  // [수집 스크립트 수정] 날짜를 찾지 못하면 '오늘~30일 뒤'로 지어내지 않고 빈 값으로 돌려준다 → 아래 main에서 제외
+  return ['', ''];
 }
 
 function isLibraryRelatedText(text) {
@@ -845,12 +847,17 @@ async function main() {
   const previous = await readPrevious();
   const carried = previous.filter((ev) => ev._source && !okSources.has(ev._source));
 
+  const dropped = { noDate: 0, ended: 0, pastYear: 0 };
+  const thisYear = Number(today.slice(0, 4));
   const byId = new Set();
   const byKey = new Set();
   const events = [];
   for (const ev of [...fresh, ...carried]) {
     if (!ev || !ev.title) continue;
-    if ((ev.endDate || ev.startDate || today) < today) continue; // 이미 끝난 행사 제외
+    if (!ev.startDate) { dropped.noDate++; continue; } // 원문에서 날짜를 찾지 못한 항목 제외(날짜를 지어내지 않음)
+    if ((ev.endDate || ev.startDate) < today) { dropped.ended++; continue; } // 이미 끝난 행사 제외
+    const years = (String(ev.title).match(/20\d{2}/g) || []).map(Number);
+    if (years.length && Math.max(...years) < thisYear) { dropped.pastYear++; continue; } // 제목에 지난 연도만 있는 행사(예: 2024 독서대전) 제외
     const key = dedupeKey(ev);
     if (byId.has(ev.id) || byKey.has(key)) continue;
     byId.add(ev.id);
@@ -877,6 +884,7 @@ async function main() {
   await writeFile(OUTPUT_PATH, JSON.stringify(output, null, 0) + '\n', 'utf8');
   console.log(`events.json 저장: ${events.length}건 (이어 쓴 지난 데이터 ${carried.length}건, ${((Date.now() - startedAt) / 1000).toFixed(1)}초)`);
   console.log('출처별:', sourceCounts);
+  console.log(`제외: 날짜 없음 ${dropped.noDate}건 · 종료 ${dropped.ended}건 · 지난 연도 제목 ${dropped.pastYear}건`);
 }
 
 main().catch((err) => {
