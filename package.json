@@ -1,0 +1,11 @@
+{
+  "name": "hana-munhwa",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "collect": "node scripts/collect.mjs"
+  },
+  "dependencies": {
+    "linkedom": "^0.18.15"
+  }
+}
