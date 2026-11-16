@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-16T04:13:56.195Z",
+ "updatedAt": "2026-11-16T04:17:17.712Z",
  "source": "국립중앙도서관 ISBN 서지정보 API",
  "sourceUrl": "https://www.nl.go.kr/seoji/",
  "note": "서명이 같고 출판사(출판사가 없으면 첫 저자)가 일치하는 책만 표지를 붙였습니다.",
