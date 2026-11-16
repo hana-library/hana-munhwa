@@ -1,0 +1,42 @@
+name: 추천도서 표지 찾기
+
+on:
+  push:
+    paths:
+      - 'adult/index.html'
+  schedule:
+    # 매주 월요일 새벽 4시 23분(한국 시간) = 일요일 UTC 19:23 — 못 찾은 책 재시도용
+    - cron: '23 19 * * 0'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: repo-write
+  cancel-in-progress: false
+
+jobs:
+  covers:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: 알라딘에서 표지 찾기
+        env:
+          ALADIN_TTB_KEY: ${{ secrets.ALADIN_TTB_KEY }}
+        run: node scripts/covers.mjs
+      - name: 바뀐 내용이 있으면 저장소에 올리기
+        run: |
+          git add adult/covers.json
+          if git diff --cached --quiet; then
+            echo "변경 없음"; exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "추천도서 표지 갱신 $(TZ=Asia/Seoul date +'%Y-%m-%d %H:%M')"
+          git pull --rebase
+          git push
