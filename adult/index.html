@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>전국 공공도서관 사서추천도서 한눈에 보기 — 성인편</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f6f9fd; --card:#fff; --ink:#14243a; --sub:#5a6b80; --line:#dde7f3;
+  --accent:#1f4e8c; --accent-soft:#e1ecf9; --warm:#9a5f14; --warm-soft:#faeeda;
+  --hero:linear-gradient(135deg,#dcebfb 0%,#eef5fd 55%,#f7fbff 100%); --new:#d93b3a; --genre:#0c447c; --genre-soft:#e6f1fb;
+}
+@media (prefers-color-scheme: dark){
+  :root{--bg:#0f1622;--card:#17202e;--ink:#e6eef8;--sub:#9fb0c6;--line:#2a3648;--accent:#7fb2f0;--accent-soft:#1a2c45;--warm:#f0b765;--warm-soft:#3a2d18;--hero:linear-gradient(135deg,#16294a 0%,#132036 60%,#101a2a 100%);--new:#ff6b6b;--genre:#a9cbf5;--genre-soft:#1c2e48;}
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans KR",system-ui,sans-serif;line-height:1.55;font-size:15px}
+.hero{background:var(--hero);border-bottom:1px solid var(--line)}
+header{padding:36px 20px 24px;max-width:1180px;margin:0 auto}
+h1{font-family:"Noto Serif KR",serif;font-size:clamp(24px,4vw,34px);margin:0 0 8px;letter-spacing:-.5px}
+.sitelink{display:inline-block;margin:14px 0 2px;padding:9px 16px;border-radius:999px;background:var(--accent);color:#fff;font-size:14px;font-weight:600;text-decoration:none}
+.sitelink:hover{filter:brightness(1.12)}
+.byline{margin:0 0 10px;font-size:13.5px;color:var(--sub)}
+.byline b{color:var(--accent)}
+a.author{color:var(--accent);font-weight:700;text-decoration:none;border-bottom:1px dashed currentColor}
+.mailmenu{position:absolute;z-index:20;width:240px;background:var(--card);border:1px solid var(--line);border-radius:10px;box-shadow:0 6px 20px rgba(20,50,100,.15);padding:6px;display:flex;flex-direction:column}
+.mailmenu[hidden]{display:none}
+.mailmenu a,.mailmenu button{display:block;text-align:left;padding:9px 10px;border-radius:7px;font:inherit;font-size:14px;color:var(--ink);text-decoration:none;background:none;border:0;cursor:pointer}
+.mailmenu a:hover,.mailmenu button:hover{background:var(--accent-soft)}
+.mm-msg{font-size:12px;color:var(--accent);padding:0 10px}
+a.author:hover{border-bottom-style:solid}
+.lede{color:var(--sub);margin:0}
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.stat{background:var(--card);border:1px solid var(--line);border-top:3px solid var(--accent);border-radius:10px;padding:10px 14px;min-width:120px;box-shadow:0 1px 3px rgba(20,50,100,.06)}
+.stat b{display:block;font-size:22px;font-variant-numeric:tabular-nums}
+.stat span{font-size:12px;color:var(--sub)}
+.controls{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+.controls-inner{max-width:1180px;margin:0 auto;padding:12px 20px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+input[type=search],select{font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink)}
+input[type=search]{flex:1 1 220px;min-width:180px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font:inherit;font-size:13px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:6px 11px;border-radius:999px;cursor:pointer}
+.chip[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:#fff}
+.view{margin-left:auto;display:flex;gap:4px}
+main{max-width:1180px;margin:0 auto;padding:18px 20px 60px}
+.count{color:var(--sub);font-size:13px;margin:0 0 12px}
+.cur{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:16px;overflow:hidden;box-shadow:0 2px 8px rgba(20,50,100,.05)}
+.cur-head{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:6px 12px;align-items:baseline}
+.cur-head h2{font-size:17px;margin:0;font-weight:700}
+.cur-head .meta{color:var(--sub);font-size:13px}
+.cur-head a{font-size:13px;color:var(--accent);margin-left:auto;white-space:nowrap}
+.tag{display:inline-block;font-size:11.5px;padding:2px 8px;border-radius:6px;background:var(--accent-soft);color:var(--accent);font-weight:500}
+.new{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.5px;padding:2px 7px;border-radius:6px;background:var(--new);color:#fff;align-self:center}
+.tag.g{background:var(--genre-soft);color:var(--genre);font-weight:600}
+.tag.aud{background:var(--warm-soft);color:var(--warm)}
+.books{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:0}
+.book{padding:12px 18px;border-top:1px solid var(--line);border-right:1px solid var(--line);margin:-1px -1px 0 0}
+.book .t{font-weight:600;font-family:"Noto Serif KR",serif;font-size:15px;line-height:1.4}
+.book .t small{display:block;font-family:"Noto Sans KR",sans-serif;font-weight:400;color:var(--sub);font-size:12px;margin-top:2px}
+.book .a{font-size:13px;color:var(--sub);margin-top:4px}
+.book .x{font-size:12px;margin-top:6px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.dup{background:var(--warm);color:#fff;font-size:11px;padding:1px 7px;border-radius:6px}
+table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;font-size:13.5px}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:var(--accent-soft);color:var(--accent);font-weight:600;position:sticky;top:58px;cursor:pointer;white-space:nowrap}
+td.title{font-weight:600}
+.tablewrap{overflow-x:auto}
+.empty{padding:40px;text-align:center;color:var(--sub)}
+footer{max-width:1180px;margin:0 auto;padding:0 20px 50px;color:var(--sub);font-size:13px}
+.license{margin-top:26px;padding:16px 18px;background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--sub);font-size:13px;line-height:1.65}
+.license h3{margin-top:0}
+.license p{margin:6px 0}
+.license b{color:var(--ink)}
+footer h3{color:var(--ink);font-size:15px;margin:24px 0 8px}
+footer ul{padding-left:18px;margin:0}
+footer a{color:var(--accent)}
+.note{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--warm);padding:12px 16px;border-radius:8px;margin-top:16px;font-size:13.5px;color:var(--ink)}
+.copybar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:0 0 12px}
+.copybar .count{margin:0}
+.copymsg{font-size:13px;color:var(--accent);margin:-6px 0 12px;min-height:0}
+.copybox{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:14px;font-size:13.5px}
+.copybox textarea{width:100%;height:160px;font:12px/1.4 ui-monospace,monospace;border:1px solid var(--line);border-radius:6px;padding:8px;background:var(--bg);color:var(--ink)}
+.book{display:flex;gap:12px;align-items:flex-start}
+.book .bi{min-width:0;flex:1}
+.cv{flex:0 0 58px;width:58px;height:84px;border-radius:4px;overflow:hidden;background:var(--accent-soft);border:1px solid var(--line);display:block;box-shadow:0 1px 3px rgba(20,50,100,.12)}
+.cv img{width:100%;height:100%;object-fit:cover;display:block}
+.cv.nocv{box-shadow:none;background:repeating-linear-gradient(135deg,var(--accent-soft),var(--accent-soft) 6px,transparent 6px,transparent 12px)}
+a.cv:hover{outline:2px solid var(--accent)}
+.covernote{font-size:12px;color:var(--sub);margin:-6px 0 12px}
+.covernote a{color:var(--accent)}
+button.copy{font:inherit;font-size:13px;border:1px solid var(--accent);color:var(--accent);background:transparent;padding:6px 11px;border-radius:8px;cursor:pointer}
+</style>
+</head>
+<body>
+<!-- HANA된 책과 문화 공통 메뉴 (세 페이지 공통, 지우지 마세요) -->
+<style>.hb-nav{background:#14243a;color:#fff;font-family:"Noto Sans KR",system-ui,sans-serif;font-size:14px;line-height:1.4}.hb-in{max-width:1180px;margin:0 auto;padding:8px 20px;display:flex;align-items:center;gap:6px 16px;flex-wrap:wrap}.hb-brand{font-weight:800;letter-spacing:-.2px;white-space:nowrap;color:#fff}.hb-brand b{color:#7fd3c4}.hb-tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}.hb-tabs::-webkit-scrollbar{display:none}.hb-tab{white-space:nowrap;padding:5px 12px;border-radius:999px;color:#c9d6e6;text-decoration:none;font-weight:500}a.hb-tab:hover{background:rgba(255,255,255,.1);color:#fff}.hb-on{background:#fff;color:#14243a;font-weight:700}@media (max-width:560px){.hb-in{padding:7px 12px}.hb-tab{padding:5px 10px;font-size:13px}}</style>
+<nav class="hb-nav" aria-label="HANA된 책과 문화"><div class="hb-in"><span class="hb-brand">HANA된 <b>책과 문화</b></span><div class="hb-tabs"><a class="hb-tab" href="../">문화행사</a><a class="hb-tab" href="https://claude.ai/artifact/DgQBKDnu2WadLuEDv5P7Gy">추천도서 · 유아~고등</a><span class="hb-tab hb-on" aria-current="page">추천도서 · 성인</span></div></div></nav>
+<div class="hero"><header>
+  <h1>전국 공공도서관 사서추천도서 한눈에 보기 <span style="font-size:.55em;color:var(--sub);font-weight:600">성인편</span></h1>
+  <p class="byline">최초 제작 2026. 11. 10. · 최종 업데이트 <span id="lastUpd">2026. 11. 10.</span> · 제작 <a class="author mail" href="#" title="제작자에게 메일 보내기">libraryviolin</a></p>
+  <p class="lede">국립도서관과 시·도 대표도서관, 지역 공공도서관의 사서가 성인 독자에게 권한 책을 한곳에 모았습니다. 도서관·지역·월로 걸러 보고, 마음에 드는 책은 원문 큐레이션에서 추천 사유를 확인해 보세요. 수집 범위는 2026년 6월~11월 게시분이며, 매월 10일에 새 추천 목록을 반영해 업데이트합니다.</p>
+  <div class="stats" id="stats"></div>
+  <div class="note"><b>범위 안내.</b> 시·도 대표도서관은 누리집에 성인 대상 사서추천 목록을 공개해 직접 확인할 수 있었던 곳만 담았습니다. 현재 <b>서울도서관·부산도서관·경남대표도서관</b> 3곳이며, 국립중앙도서관·국립세종도서관은 국립으로 따로 분류했습니다. 출판사가 「—」인 책은 보도자료에 출판사가 없던 경우이니 원문에서 확인해 주세요.</div>
+</header></div>
+
+<div class="controls">
+  <div class="controls-inner">
+    <input type="search" id="q" placeholder="서명·저자·출판사·주제 검색" aria-label="검색">
+    <div class="chips" id="kindChips" role="group" aria-label="도서관 유형"></div>
+    <select id="region" aria-label="지역"></select>
+    <select id="genre" aria-label="장르"></select>
+    <select id="lib" aria-label="도서관"></select>
+    <select id="month" aria-label="추천 월"></select>
+    <div class="view">
+      <button class="chip" id="vCard" aria-pressed="true">큐레이션별</button>
+      <button class="chip" id="vTable" aria-pressed="false">표로 보기</button>
+    </div>
+  </div>
+</div>
+
+<main>
+  <div class="copybar"><p class="count" id="count"></p><span style="display:flex;gap:6px;flex-wrap:wrap"><button class="copy" id="xlsxBtn">⬇ 엑셀 파일(.xlsx) 받기</button><button class="copy" id="copyBtn">📋 엑셀용으로 목록 복사</button></span></div>
+  <p class="covernote">표지 이미지: <a href="https://www.aladin.co.kr" target="_blank" rel="noopener">알라딘</a> 제공 · 표지를 누르면 알라딘 도서 정보로 이동합니다. 서명·출판사가 정확히 일치하는 책만 표지를 붙였습니다.</p>
+  <p id="copyMsg" class="copymsg"></p>
+  <div id="copyBox" class="copybox" hidden><p>자동 복사가 막힌 환경입니다. 아래 칸이 모두 선택되어 있으니 <b>Ctrl+C</b>(맥은 <b>⌘+C</b>)로 복사해 엑셀 첫 칸에 붙여넣으세요. <button class="copy" id="copyClose">닫기</button></p><textarea id="copyArea" readonly></textarea></div>
+  <div id="out"></div>
+</main>
+
+<footer>
+  <h3>출처</h3>
+  <ul id="srcList"></ul>
+  <h3>수집 기준</h3>
+  <ul>
+    <li>국립중앙도서관: 격월 발표, 문학·인문예술·사회과학·자연과학 분야별 2권(총 8권). 2026년 6월·8월·10월 발표분.</li>
+    <li>시·도 대표도서관: 각 도서관 누리집의 사서추천·추천도서 메뉴에서 직접 확인했습니다. 서울도서관은 「사서 추천 도서」 주제 목록 중 일반자료실의 성인 도서만 옮겼고(같은 목록에 섞인 어린이책은 제외), 부산도서관은 「추천하는 책 › 성인」, 경남대표도서관은 「북큐레이션」 가운데 성인 도서만 담았습니다.</li>
+    <li>부산도서관·경남대표도서관 목록은 누리집에 추천 연월이 표기되어 있지 않아, 확인일(11월 10일)에 게시 중이던 목록을 11월로 분류했습니다.</li>
+    <li>지역 공공도서관: 작은도서관 통합홈페이지(mcst.go.kr/slibrary) 「추천도서」 게시판의 2026년 6~11월 게시물. 각 도서관의 원래 북큐레이션 페이지로 연결됩니다.</li>
+    <li>「여러 곳 추천」 표시는 이 페이지에 모인 목록 안에서 같은 책이 두 번 이상 나온 경우입니다(국립세종도서관 10월 목록은 국립중앙도서관 10월 목록과 6권이 겹칩니다).</li>
+    <li>「독서 IN」의 「공공도서관 7월 인기도서」는 작은도서관 통합홈페이지 추천도서 게시판에 올라와 있지만, 원문이 대출 순위 목록으로 연결되어 사서가 고른 추천으로 보기 어려워 제외했습니다.</li>
+    <li>장르는 도서관이 붙인 분류가 아니라 이 페이지에서 정리한 것입니다. 서울·부산도서관 목록은 청구기호(KDC)를, 국립중앙도서관은 발표 분야와 보도 내용을, 나머지는 출판사 책 소개를 근거로 12개 장르로 나눴습니다. 경계가 애매한 책(예: 여행 에세이, 독서 에세이)은 독자가 찾기 쉬운 쪽을 택했으니 원문 분류와 다를 수 있습니다.</li>
+    <li><span class="new">NEW</span> 표시는 가장 최근 업데이트 때 새로 들어온 큐레이션입니다.</li>
+    <li>최종 확인: 2026년 11월 10일.</li>
+  </ul>
+  <div class="license">
+    <h3>저작자 표시 및 라이선스</h3>
+    <p><b>© 2026 <a class="author mail" href="#" title="제작자에게 메일 보내기">libraryviolin</a></b> · 이 페이지의 구성, 장르 분류, 편집과 화면 디자인은 libraryviolin이 만들었습니다.</p>
+    <p>이 페이지의 편집물은 <a href="https://creativecommons.org/licenses/by-nc/4.0/deed.ko" target="_blank" rel="noopener">크리에이티브 커먼즈 저작자표시-비영리 4.0 국제 라이선스(CC BY-NC 4.0)</a>에 따라 이용할 수 있습니다. 출처(libraryviolin, 「전국 공공도서관 사서추천도서 한눈에 보기 — 성인편」)를 밝히면 비영리 목적으로 자유롭게 복사·공유·수정할 수 있으며, 영리 목적으로 쓰려면 별도로 허락을 받아야 합니다(문의는 위 libraryviolin을 눌러 주세요).</p>
+    <p>각 추천 목록의 선정과 큐레이션 주제는 해당 도서관의 것입니다. 책 표지 이미지는 알라딘 OpenAPI로 불러와 보여 주는 것으로, 저작권은 각 출판사와 저작자에게 있으며 이 페이지의 라이선스가 적용되지 않습니다. 책 소개는 싣지 않았으니 추천 사유와 자세한 내용은 각 도서관의 원문 링크에서 확인해 주세요. 이 라이선스는 각 도서관과 출판사의 저작물에는 적용되지 않습니다.</p>
+  </div>
+</footer>
+
+<script>
+const CUR = [
+ {id:"nl-2610", lib:"국립중앙도서관", region:"서울", kind:"국립", theme:"2026년 10월 사서추천도서", month:"2026-10", aud:"성인",
+  url:"https://www.seoul.co.kr/news/life/publication-literature/2026/10/06/20261006500278", urlLabel:"발표 기사(서울신문)",
+  books:[
+   ["삼문동 봉주르 아파트","오서","—","","문학"],
+   ["애니가 남긴 것","애너 퀸들런","—","","문학"],
+   ["마음은 아직 수습입니다","박혜연","휴머니스트","2026","인문예술","삐끗하면 뒤처지는 불안 세대를 위한 심리학"],
+   ["시간을 읽는 그림","김선지","블랙피쉬","2025","인문예술","수천 년 세계사를 담은 기록의 그림들"],
+   ["호모 딜리버리쿠스","김철민","홀리데이북스","2026","사회과학","배송 문명은 어떻게 우리를 바꿨는가"],
+   ["욕망의 음식","연호탁","글항아리","2026","사회과학","역사와 문화에 깃든 탐식의 인류학"],
+   ["최소한의 양자역학","프랑크 베르스트라테·셀린 브뢰카에르트 / 최진영 옮김","동아엠앤비","2025","자연과학","아무도 모르지만 누구나 알아야 할"],
+   ["기후위기는 어떻게 내 몸을 병들게 하는가","크리스티나 베른트 / 추미란 옮김","동녘","2026","자연과학"]
+  ]},
+ {id:"nl-2608", lib:"국립중앙도서관", region:"서울", kind:"국립", theme:"2026년 8월 사서추천도서", month:"2026-08", aud:"성인",
+  url:"https://nocutnews.co.kr/news/6558147", urlLabel:"발표 기사(노컷뉴스)",
+  books:[
+   ["검은 해바라기","요윤희","—","","문학"],
+   ["오로라를 따라간 푸트만스 씨","헨드릭 흐룬","—","","문학"],
+   ["그래서 지금 기분은 어때요?","조슈아 플레처","—","","인문예술"],
+   ["찰나의 기억, 냄새","김성현","—","","인문예술"],
+   ["알면 알수록 빠져드는 지명속담 이야기","강순돌","—","","사회과학"],
+   ["쾌적한 사회의 불쾌함","구마시로 도루 / 이정미 옮김","생각지도","2026","사회과학"],
+   ["뇌는 어떻게 나를 조종하는가","크리스 나이바우어","—","","자연과학"],
+   ["완벽하지 않은 것이 살아남는다","대니얼 R. 브룩스 외","—","","자연과학"]
+  ]},
+ {id:"nl-2606", lib:"국립중앙도서관", region:"서울", kind:"국립", theme:"2026년 6월 사서추천도서", month:"2026-06", aud:"성인",
+  url:"https://www.nl.go.kr/NL/contents/N50603000000.do?schM=view&id=57119&schBcid=normal0302", urlLabel:"보도자료(국립중앙도서관)",
+  books:[
+   ["믿을 수 있을 만큼의 진실", "김유나", "—", "", "문학"],
+   ["불필요한 여자", "라비 알라메딘", "—", "", "문학"],
+   ["일터에 관한 낯선 시선", "김원", "머스트리드북", "2025", "인문예술", "무뎌진 생존 감각을 일깨우는 인문학적 도구 25"],
+   ["중독은 뇌를 어떻게 바꾸는가", "저드슨 브루어", "—", "", "인문예술"],
+   ["소멸하지 않는 도시", "경신원", "투래빗", "2025", "사회과학"],
+   ["어느 서민 여성의 삶, 노년, 죽음", "디디에 에리봉", "—", "", "사회과학"],
+   ["자연은 포기하지 않는다", "—", "—", "", "자연과학"],
+   ["청소의 과학", "송현수", "—", "", "자연과학"]
+  ]},
+ {id:"sejong-2610", lib:"국립세종도서관", region:"세종", kind:"국립", theme:"10월 사서추천도서", month:"2026-10", aud:"성인",
+  url:"https://sejong.nl.go.kr/saseo/recomdList.do?menuId=O230&upperMenuId=O200", urlLabel:"원문 목록",
+  books:[
+   ["시간을 읽는 그림","김선지","블랙피쉬","2025","","수천 년 세계사를 담은 기록의 그림들"],
+   ["호모 딜리버리쿠스","김철민","홀리데이북스","2026","","배송 문명은 어떻게 우리를 바꿨는가"],
+   ["기후위기는 어떻게 내 몸을 병들게 하는가","크리스티나 베른트 / 추미란 옮김","동녘","2026",""],
+   ["최소한의 양자역학","프랑크 베르스트라테·셀린 브뢰카에르트 / 최진영 옮김","동아엠앤비","2025",""],
+   ["마음은 아직 수습입니다","박혜연","휴머니스트","2026",""],
+   ["욕망의 음식","연호탁","글항아리","2026",""]
+  ]},
+ {id:"seoul-2611", added:"2026-11-10", lib:"서울도서관", region:"서울", kind:"광역대표", theme:"일 벌이는 게 취미입니다 — 트렌드를 만드는 기획 이야기", month:"2026-11", aud:"성인",
+  url:"https://lib.seoul.go.kr/intro/list/309", urlLabel:"원문 목록",
+  books:[
+   ["도시의 해상도","이지현","파이퍼프레스","2026","","서울의 선명한 경험은 어떻게 만들어지는가"],
+   ["핫플레이스의 법칙","임상백","매경출판","2026","","또 가고 싶은 공간의 비밀"],
+   ["더 센스","호소다 다카히로","롱블랙(타임앤코)","2025","","당신도 센스가 있다"],
+   ["관점을 파는 일","차우진","유유","2025","","콘텐츠로 먹고사는 이들을 위한 지속 가능한 뉴스레터 탐구"],
+   ["이름보다 브랜딩","김지헌","플랜비디자인","2025",""],
+   ["아트프레너, 창작을 파는 힘","미리엄 슐먼","반니","2024","","창의성이 비즈니스가 되는 예술 기업가의 생각법"],
+   ["창의성에 집착하는 시대","새뮤얼 W. 프랭클린","해나무","2025",""],
+   ["귀여운 거 그려서 20년 살아남았습니다","정헌재","아워미디어","2023","","좋아하는 일, 꾸준히 오래 하면, 생기는 일"]
+  ]},
+ {id:"seoul-2610", lib:"서울도서관", region:"서울", kind:"광역대표", theme:"낭만 가득, 가을 산책", month:"2026-10", aud:"성인",
+  url:"https://lib.seoul.go.kr/intro/list/308", urlLabel:"원문 목록",
+  books:[
+   ["네가 다시 제주였으면 좋겠어","김현길 글·그림","상상출판","2021","","그림으로 남긴 순간들"],
+   ["나의 손이 내게 말했다","이정화","책나물","2023","","이정화 에세이"],
+   ["혼여행 기록집","최유진","동양북스","2026","","내가 차린 고요"],
+   ["퇴근 후, 책방 여행","이연주","리얼북스","2021",""],
+   ["일본 소도시 여행","박탄호","플래닝북스","2017",""],
+   ["(타이난 골목) 노포 산책","천구이팡 글·그림","페이퍼스토리","2021",""],
+   ["떡지순례","떡지순례","비타북스","2022","","오늘도 인생 떡볶이를 찾아 떠날 거야"],
+   ["대한민국 빵집 대장정","개띠랑","청림Life","2026","","빵 특파원 개띠랑과 떠나는 빵빵곡곡 빵지순례"]
+  ]},
+ {id:"seoul-2609", lib:"서울도서관", region:"서울", kind:"광역대표", theme:"책, 어떻게 우리에게 닿았을까? — 독서의 달", month:"2026-09", aud:"성인",
+  url:"https://lib.seoul.go.kr/intro/list/307", urlLabel:"원문 목록",
+  books:[
+   ["나는 매일 책 읽어주는 엄마입니다","이혜진","이퍼블릭","2020","","일 년 열두 달 우리 집 독서 달력"],
+   ["그림책은 힘이 세다","박미숙","책이라는신화","2023","","도서관에서 발견한 47가지 그림책 질문"],
+   ["책 한번 써봅시다","장강명","한겨레출판","2020",""],
+   ["귀찮지만 행복해 볼까","권남희","상상출판","2020","","번역가 권남희 에세이집"],
+   ["책이었고 책이며 책이 될 무엇에 관한, 책","애머런스 보서크","마티","2019",""],
+   ["세계문학전집 이야기","민음사 편집부","민음사","2026",""],
+   ["결국 다 좋아서 하는 거잖아요","김승복","달","2025","","도쿄의 유일한 한국어 책방"],
+   ["책의 미래를 찾는 여행, 타이베이","우치누마 신타로","컴인","2020",""],
+   ["사서, 고생","김선영","문학수첩","2023",""],
+   ["닥치는 대로 끌리는 대로 오직 재미있게 이동진 독서법","이동진","위즈덤하우스","2022","","큰글자도서"]
+  ]},
+ {id:"seoul-2608", lib:"서울도서관", region:"서울", kind:"광역대표", theme:"여름 밤, 서가 사이에서 — 공포·스릴러 장르문학", month:"2026-08", aud:"성인",
+  url:"https://lib.seoul.go.kr/intro/list/306", urlLabel:"원문 목록",
+  books:[
+   ["한국 괴물 백과","곽재식","워크룸프레스","2024",""],
+   ["여성, 귀신이 되다","전혜진","현암사","2021",""],
+   ["삼개주막 기담회","오윤희","고즈넉이엔티","2021",""],
+   ["긴키 지방의 어느 장소에 대하여","세스지","반타","2025",""],
+   ["힐 하우스의 유령","셜리 잭슨","엘릭시르","2014",""],
+   ["홀리","스티븐 킹","황금가지","2024",""],
+   ["트로피컬 나이트","조예은","한겨레출판","2022",""],
+   ["므레모사","김초엽","현대문학","2021",""]
+  ]},
+ {id:"busan-2611", added:"2026-11-10", lib:"부산도서관", region:"부산", kind:"광역대표", theme:"추천하는 책 · 성인 (추천 연월 미표기, 11월 10일 게시 중)", month:"2026-11", aud:"성인",
+  url:"https://library.busan.go.kr/busanlibrary/board/index.do?menu_idx=180&manage_idx=608", urlLabel:"원문 목록",
+  books:[
+   ["카오스의 가장자리","데이비드 수실로 / 이충호 옮김","북하우스","2026","","부서진 유년의 파편에서 출현한 신경과학자 이야기"],
+   ["그랬다고 적었다","김애란","문학동네","2026","","김애란 산문"],
+   ["욕망의 음식","연호탁","글항아리","2026","","역사와 문화에 깃든 탐식의 인류학"],
+   ["메모의 문화사","헥토어 하르쾨터 / 김인건 옮김","arte","2026","","다빈치 노트에서 디지털 메모장까지"]
+  ]},
+ {id:"gyeongnam-2611", added:"2026-11-10", lib:"경남대표도서관", region:"경남", kind:"광역대표", theme:"시각장애·점자 주제 북큐레이션 중 성인 도서 (게시 연월 미표기)", month:"2026-11", aud:"성인",
+  url:"https://lib.gyeongnam.go.kr/index.lib?menuCd=DOM_000000201019000000", urlLabel:"원문 큐레이션",
+  books:[
+   ["보이지 않은 역사","주윤정","들녘","2020","","한국 시각장애인들의 저항과 연대"],
+   ["눈 감으면 보이는 것들","신순규","판미동","2015","","월가 시각장애인 애널리스트가 전하는 일상의 기적"],
+   ["마음으로 보는 시","경남문인협회 편","경남문인협회","2009","","시각장애인을 위한 경남 시인들의 사랑 노래"]
+  ]},
+ {id:"aram-2611", added:"2026-11-10", lib:"고양 아람누리도서관", region:"경기 고양", kind:"지역", theme:"늙음의 레슨 — 더 깊고, 더 단단한 오늘을 위한", month:"2026-11", aud:"성인",
+  url:"https://www.goyanglib.or.kr/center/menu/10012/program/30008/curationDetail.do?currentPageNo=2&curationIdx=523401&manageCd=ALL", urlLabel:"원문 큐레이션",
+  books:[
+   ["초보 노인입니다","김순옥","민음사","2023",""],
+   ["즐거운 어른","이옥선","이야기장수","2024",""],
+   ["품위 있게 나이 드는 법","버나드 오티스 / 박선령 옮김","검둥소","2020",""],
+   ["미술관에서 노년을 만났습니다","주지현","혜윰터","2026","","명화가 건네는 늙어감, 돌봄, 죽음 그리고 삶"],
+   ["나이 든다는 것에 관하여","베레나 카스트 / 김현정 옮김","을유문화사","2024",""],
+   ["백 살까지 유쾌하게 나이 드는 법","이근후","메이븐","2024","","개정증보판"]
+  ]},
+ {id:"chungju-2610", lib:"충주시립도서관", region:"충북 충주", kind:"지역", theme:"디저트와 함께하는 달콤한 독서", month:"2026-10", aud:"전연령",
+  url:"https://lib.chungju.go.kr/lib/web/menu/10054/program/30009/curationDetail.do?currentPageNo=1&curationIdx=47377", urlLabel:"원문 큐레이션",
+  books:[
+   ["달콤한 세상","빅토리아 그레이스 엘리엇 / 노지양 옮김","시공주니어","2022","","사르르, 디저트의 역사"],
+   ["사탕비","청예","고즈넉이엔티","2023",""],
+   ["대한민국 빵집 대장정","개띠랑","청림Life","2026","","빵 특파원 개띠랑과 떠나는 빵빵곡곡 빵지순례"],
+   ["블랙케이크","샤메인 윌커슨 / 서제인 옮김","열린책들","2023",""],
+   ["완벽한 케이크의 맛","김혜진 글 / 박혜진 그림","마음산책","2023",""],
+   ["쿠키 두 개","이희영 글 / 양양 그림","창비","2025",""]
+  ]},
+ {id:"aram-2610", lib:"고양 아람누리도서관", region:"경기 고양", kind:"지역", theme:"한글: 우리가 사랑한 우리말, 우리글 (한글날 기념)", month:"2026-10", aud:"성인",
+  url:"https://www.goyanglib.or.kr/center/menu/10012/program/30008/curationDetail.do?currentPageNo=1&curationIdx=518766&manageCd=ALL", urlLabel:"원문 큐레이션",
+  books:[
+   ["우리말 어법 사전","김종욱","미문사","2023","","헷갈리고 잘 틀리는 우리말 바로쓰기"],
+   ["한권으로 읽는 세종대왕실록","박영규","웅진지식하우스","2008",""],
+   ["한글의 탄생","노마 히데키 / 김진아·김기연·박수진 옮김","돌베개","2011","","문자라는 기적"],
+   ["위대한 유산 한글 580년의 여정","여주세종문화재단 엮음","가갸날","2021",""],
+   ["훈민정음은 어떻게 만들어 졌는가","김순기","가온누리","2024",""],
+   ["우리말 기본기 다지기","오경철","교유서가","2024","","바른 문장, 섬세한 표현을 위한 맞춤법 표준어 공부"]
+  ]},
+ {id:"samsong-2609", lib:"고양 삼송도서관", region:"경기 고양", kind:"지역", theme:"그럼에도 책, 여전히 책", month:"2026-09", aud:"성인",
+  url:"https://www.mcst.go.kr/slibrary/program/books/3264", urlLabel:"게시물(작은도서관 통합홈페이지)",
+  books:[
+   ["독서의 기쁨","김겨울","초록비책공방","2024","","책 읽고 싶어지는 책"],
+   ["책을 읽다가 잠이 들면 좋은 일이 일어남","박솔뫼","위즈덤하우스","2024",""],
+   ["하필 책이 좋아서","김동신·신연선·정세랑","북노마드","2024",""],
+   ["책읽기의 달인, 호모 부커스","이권우","오도스","2022",""],
+   ["생활 독서","유광수","북플랫","2025","","보는 인간에서 읽는 인간으로"],
+   ["독서의 기술","고명환","라곰","2026","","책은 어떻게 삶의 무기가 되는가"]
+  ]},
+ {id:"mokdong-2609", lib:"화성 목동이음터도서관", region:"경기 화성", kind:"지역", theme:"세계 자살예방의 날 — 마음 건강", month:"2026-09", aud:"성인",
+  url:"https://www.hscitylib.or.kr/intro/menu/10025/program/30012/curationDetail.do?currentPageNo=1&manageCd=ALL&curationIdx=15005", urlLabel:"원문 큐레이션",
+  books:[
+   ["우울할 땐 뇌 과학","앨릭스 코브 / 정지인 옮김","심심","2018",""],
+   ["어두울 때에야 보이는 것들이 있습니다","슈테판 츠바이크 / 배명자 옮김","다산초당","2024","","슈테판 츠바이크의 마지막 수업"],
+   ["남겨진 것들의 기록","김새별·전애원","청림출판","2024","","유품정리사가 써내려간 떠난 이들의 뒷모습"],
+   ["언어의 온도","이기주","말글터","2016",""],
+   ["정신 차리라는 말은 하지 말아요","주노 도슨 / 김인경 옮김","탐","2017","청소년","십 대를 위한 정신 건강의 모든 것"],
+   ["나는 자살 생존자입니다","황웃는돌","문학동네","2023",""]
+  ]},
+ {id:"nopbit-2608", lib:"고양 높빛도서관", region:"경기 고양", kind:"지역", theme:"히가시노 게이고를 기억하며", month:"2026-08", aud:"성인",
+  url:"https://www.goyanglib.or.kr/center/menu/10012/program/30008/curationDetail.do?currentPageNo=1&curationIdx=512380&manageCd=ALL", urlLabel:"원문 큐레이션",
+  books:[
+   ["사이언스?","히가시노 게이고 / 김은모 옮김","현대문학","2025",""],
+   ["천공의 벌","히가시노 게이고 / 김난주 옮김","재인","2016",""],
+   ["나미야 잡화점의 기적","히가시노 게이고 / 양윤옥 옮김","현대문학","2012",""],
+   ["인어가 잠든 집","히가시노 게이고 / 김난주 옮김","재인","2019",""],
+   ["편지","히가시노 게이고 / 권일영 옮김","알에이치코리아","2019",""],
+   ["기린의 날개","히가시노 게이고 / 김난주 옮김","재인","2017",""]
+  ]},
+ {id:"deogi-2608", lib:"고양 덕이도서관", region:"경기 고양", kind:"지역", theme:"일상에서 만나는 철학", month:"2026-08", aud:"성인",
+  url:"https://www.goyanglib.or.kr/center/menu/10012/program/30008/curationDetail.do?currentPageNo=1&curationIdx=511820&manageCd=ALL", urlLabel:"원문 큐레이션",
+  books:[
+   ["듣기의 철학","정경영 외","곰","2025",""],
+   ["삶은 여전히 빛난다","로랑스 드빌레르 / 이주영 옮김","위즈덤하우스","2025",""],
+   ["오십이 철학을 마주할 때","안광복","다산초당","2025",""],
+   ["알고리즘으로 철학하기","변정수","이상북스","2025",""],
+   ["철학의 기쁨","문성원","그린비","2025",""],
+   ["인생은 개처럼 사는 편이 좋다","크라테스 외 / 서미석 옮김","유유","2025",""]
+  ]},
+ {id:"chungju-2607", lib:"충주시립도서관", region:"충북 충주", kind:"지역", theme:"여름 밤 오싹 공포도서 (성인 도서만, 아동 도서 4권 제외)", month:"2026-07", aud:"성인",
+  url:"https://lib.chungju.go.kr/web/menu/10054/program/30009/curationDetail.do?currentPageNo=1&curationIdx=46371", urlLabel:"원문 큐레이션",
+  books:[
+   ["홍학의 자리", "정해연", "엘릭시르", "2021", ""],
+   ["7년의 밤", "정유정", "은행나무", "2011", ""]
+  ]},
+ {id:"chungju-2606", lib:"충주시립도서관", region:"충북 충주", kind:"지역", theme:"'나'를 만나는 시간, 자아 발견 추천도서", month:"2026-06", aud:"성인",
+  url:"https://lib.chungju.go.kr/web/menu/10054/program/30009/curationDetail.do?currentPageNo=1&curationIdx=46014", urlLabel:"원문 큐레이션",
+  books:[
+   ["빅터 프랭클의 죽음의 수용소에서", "빅터 프랭클 / 이시형 옮김", "청아출판사", "2026", ""],
+   ["내가 틀릴 수도 있습니다", "비욘 나티코 린데블라드 / 박미경 옮김", "다산초당", "2022", "", "숲속의 현자가 전하는 마지막 인생 수업"],
+   ["내면소통", "김주환", "인플루엔셜", "2023", "", "삶의 변화를 가져오는 마음근력 훈련"],
+   ["훌훌", "문경민", "문학동네", "2022", ""],
+   ["오백 년째 열다섯", "김혜정", "위즈덤하우스", "2023", ""],
+   ["아몬드", "손원평", "창비", "2017", ""]
+  ]},
+ {id:"byeongjeom-2607", lib:"화성 병점도서관", region:"경기 화성", kind:"지역", theme:"나도 도시 농부", month:"2026-07", aud:"성인",
+  url:"https://www.hscitylib.or.kr/intro/menu/10025/program/30012/curationDetail.do?currentPageNo=1&manageCd=ALL&curationIdx=14641", urlLabel:"원문 큐레이션",
+  books:[
+   ["화분 텃밭", "쑥쑥크리", "해든아침", "2021", ""],
+   ["정원의 쓸모", "수 스튜어트 스미스 / 고정아 옮김", "윌북", "2021", "", "흙 묻은 손이 마음을 어루만지다"],
+   ["나만의 텃밭 가꾸기", "뤽 비엥브뉘·로랑 우쌩 / 이정주 옮김", "청아출판사", "2023", ""],
+   ["지구를 살리는 기발한 생각 10", "박경화", "한겨레출판", "2023", ""],
+   ["옷을 사지 않기로 했습니다", "이소연", "돌고래", "2023", "", "기후위기와 패스트패션에 맞서는 제로웨이스트 의생활"],
+   ["1일 1쓰레기 1제로", "캐서린 켈로그 / 박여진 옮김", "현대지성", "2022", ""]
+  ]},
+ {id:"daehwa-2607", lib:"고양 대화도서관", region:"경기 고양", kind:"지역", theme:"대화의 한페이지: 고립과 연결 사이", month:"2026-07", aud:"성인",
+  url:"https://www.mcst.go.kr/slibrary/program/books/3254", urlLabel:"게시물(작은도서관 통합홈페이지)",
+  books:[
+   ["혼자 사는 사람들을 위한 주거 실험", "조성익", "웅진지식하우스", "2022", ""],
+   ["필연적 혼자의 시대", "김수영", "다산북스", "2026", ""],
+   ["고립의 시대", "노리나 허츠 / 홍정인 옮김", "웅진지식하우스", "2021", ""],
+   ["외로움의 습격", "김만권", "혜다", "2023", ""],
+   ["우리는 다시 연결되어야 한다", "비벡 H. 머시 / 이주영 옮김", "한국경제신문", "2020", ""],
+   ["집이 아니라 방에 삽니다", "신민주", "디귿", "2021", ""]
+  ]},
+ {id:"daehwa-2606", lib:"고양 대화도서관", region:"경기 고양", kind:"지역", theme:"책으로 그린(Green) 미래 — 환경의 날", month:"2026-06", aud:"성인",
+  url:"https://www.goyanglib.or.kr/center/menu/10012/program/30008/curationDetail.do?currentPageNo=1&manageCd=ALL&curationIdx=502307", urlLabel:"원문 큐레이션",
+  books:[
+   ["환경과 생태 쫌 아는 10대", "최원형 글 / 방상호 그림", "풀빛", "2019", ""],
+   ["쓰레기책", "이동학", "오도스", "2020", "", "왜 지구의 절반은 쓰레기로 뒤덮이는가"],
+   ["왜요, 기후가 어떤데요?", "최원형 글 / 코피루왁 그림", "동녘", "2021", "", "탄소 발자국에 숨은 기후 위기"],
+   ["기후위기인간", "구희", "알에이치코리아", "2023", ""],
+   ["지구를 살리는 옷장", "박진영·신하나", "창비", "2022", ""],
+   ["기후미식", "이의철", "위즈덤하우스", "2022", "", "우리가 먹는 것이 지구의 미래다"]
+  ]},
+ {id:"siksa-2606", lib:"고양 식사도서관", region:"경기 고양", kind:"지역", theme:"6월, 월드컵을 읽다", month:"2026-06", aud:"성인",
+  url:"https://www.goyanglib.or.kr/center/menu/10012/program/30008/curationDetail.do?currentPageNo=1&manageCd=ALL&curationIdx=503318", urlLabel:"원문 큐레이션",
+  books:[
+   ["유럽 축구 여행", "정꽃보라·정꽃나래", "중앙북스", "2025", ""],
+   ["모든 것은 기본에서 시작한다", "손웅정", "수오서재", "2021", ""],
+   ["축구가 10배 더 재밌어지는 경기 관전법", "하야시 료헤이 / 김정환 옮김", "초록북스", "2025", ""],
+   ["내 아이가 축구를 한다면 꼭 전해 주고 싶은 이야기", "조세민", "한스미디어", "2025", ""],
+   ["닥터풋볼", "정태석", "영창", "2022", ""],
+   ["축구를 하며 생각한 것들", "손흥민", "브레인스토어", "2020", ""]
+  ]},
+ {id:"bongdam-2606", lib:"화성 봉담와우도서관", region:"경기 화성", kind:"지역", theme:"내 일(Job)이 내일(Tomorrow)을 만든다", month:"2026-06", aud:"성인",
+  url:"https://www.hscitylib.or.kr/intro/menu/10025/program/30012/curationDetail.do?currentPageNo=2&manageCd=ALL&curationIdx=14439", urlLabel:"원문 큐레이션",
+  books:[
+   ["오늘부터 실패하지 않게 일하는 법", "홍순성", "애드앤미디어", "2024", ""],
+   ["(일하면서 바로 써먹는) 아웃풋×성과 도감", "가바사와 시온 / 전경아 옮김", "현대지성", "2026", ""],
+   ["진정한 나의 일을 찾아서", "에노모토 히데타케 / 정영희 옮김", "매일경제신문사", "2022", ""],
+   ["커넥팅", "신수정", "김영사", "2024", ""],
+   ["퇴근길의 마음", "이다혜", "빅피시", "2022", ""],
+   ["가짜 노동", "데니스 뇌르마르크·아네르스 포그 옌센 / 이수영 옮김", "자음과모음", "2022", "", "스스로 만드는 번아웃의 세계"]
+  ]}
+];
+
+const GENRE = {"삼문동 봉주르 아파트": ["소설", "한국 장편"], "애니가 남긴 것": ["소설", "영미"], "검은 해바라기": ["소설", "미스터리"], "오로라를 따라간 푸트만스 씨": ["소설", "네덜란드"], "마음은 아직 수습입니다": ["인문", "심리"], "그래서 지금 기분은 어때요?": ["인문", "심리 에세이"], "찰나의 기억, 냄새": ["인문", ""], "시간을 읽는 그림": ["예술", "그림으로 읽는 세계사"], "호모 딜리버리쿠스": ["사회·문화", ""], "욕망의 음식": ["사회·문화", "음식 인류학"], "알면 알수록 빠져드는 지명속담 이야기": ["사회·문화", ""], "쾌적한 사회의 불쾌함": ["사회·문화", ""], "최소한의 양자역학": ["과학", "물리"], "기후위기는 어떻게 내 몸을 병들게 하는가": ["과학", "기후·건강"], "뇌는 어떻게 나를 조종하는가": ["과학", "뇌과학"], "완벽하지 않은 것이 살아남는다": ["과학", "진화"], "도시의 해상도": ["사회·문화", "도시"], "핫플레이스의 법칙": ["경제·경영", "공간 기획"], "더 센스": ["경제·경영", ""], "관점을 파는 일": ["사회·문화", "미디어·콘텐츠"], "이름보다 브랜딩": ["경제·경영", "브랜딩"], "아트프레너, 창작을 파는 힘": ["예술", "예술 경영"], "창의성에 집착하는 시대": ["인문", ""], "귀여운 거 그려서 20년 살아남았습니다": ["에세이", ""], "네가 다시 제주였으면 좋겠어": ["여행", "그림 에세이"], "나의 손이 내게 말했다": ["에세이", ""], "혼여행 기록집": ["에세이", "여행"], "퇴근 후, 책방 여행": ["책·독서", "책방"], "일본 소도시 여행": ["여행", ""], "(타이난 골목) 노포 산책": ["여행", ""], "떡지순례": ["요리·생활", "미식"], "대한민국 빵집 대장정": ["요리·생활", "미식"], "나는 매일 책 읽어주는 엄마입니다": ["책·독서", "가정 독서"], "그림책은 힘이 세다": ["책·독서", "그림책"], "책 한번 써봅시다": ["책·독서", "글쓰기"], "귀찮지만 행복해 볼까": ["에세이", ""], "책이었고 책이며 책이 될 무엇에 관한, 책": ["책·독서", "책의 역사"], "세계문학전집 이야기": ["책·독서", "출판"], "결국 다 좋아서 하는 거잖아요": ["에세이", "책방"], "책의 미래를 찾는 여행, 타이베이": ["책·독서", "서점·출판"], "사서, 고생": ["책·독서", "사서 에세이"], "닥치는 대로 끌리는 대로 오직 재미있게 이동진 독서법": ["책·독서", "독서법"], "한국 괴물 백과": ["인문", "민속·괴물"], "여성, 귀신이 되다": ["사회·문화", "민속"], "삼개주막 기담회": ["소설", "기담"], "긴키 지방의 어느 장소에 대하여": ["소설", "호러"], "힐 하우스의 유령": ["소설", "호러"], "홀리": ["소설", "스릴러"], "트로피컬 나이트": ["소설", "호러 단편집"], "므레모사": ["소설", "SF"], "카오스의 가장자리": ["에세이", "회고록"], "그랬다고 적었다": ["에세이", "산문"], "메모의 문화사": ["인문", "기록의 역사"], "보이지 않은 역사": ["사회·문화", "장애사"], "눈 감으면 보이는 것들": ["에세이", ""], "마음으로 보는 시": ["시", ""], "초보 노인입니다": ["에세이", "나이 듦"], "즐거운 어른": ["에세이", "나이 듦"], "품위 있게 나이 드는 법": ["인문", "나이 듦"], "미술관에서 노년을 만났습니다": ["예술", "명화"], "나이 든다는 것에 관하여": ["인문", "심리"], "백 살까지 유쾌하게 나이 드는 법": ["에세이", "나이 듦"], "달콤한 세상": ["요리·생활", "디저트의 역사"], "사탕비": ["소설", ""], "블랙케이크": ["소설", "영미"], "완벽한 케이크의 맛": ["소설", "짧은 소설"], "쿠키 두 개": ["소설", ""], "우리말 어법 사전": ["인문", "언어"], "한권으로 읽는 세종대왕실록": ["역사", ""], "한글의 탄생": ["인문", "언어"], "위대한 유산 한글 580년의 여정": ["인문", "언어"], "훈민정음은 어떻게 만들어 졌는가": ["인문", "언어"], "우리말 기본기 다지기": ["인문", "언어"], "독서의 기쁨": ["책·독서", ""], "책을 읽다가 잠이 들면 좋은 일이 일어남": ["책·독서", "독서 에세이"], "하필 책이 좋아서": ["책·독서", "출판인 에세이"], "책읽기의 달인, 호모 부커스": ["책·독서", ""], "생활 독서": ["책·독서", ""], "독서의 기술": ["책·독서", ""], "우울할 땐 뇌 과학": ["과학", "뇌과학"], "어두울 때에야 보이는 것들이 있습니다": ["인문", ""], "남겨진 것들의 기록": ["에세이", ""], "언어의 온도": ["에세이", ""], "정신 차리라는 말은 하지 말아요": ["인문", "정신 건강(청소년)"], "나는 자살 생존자입니다": ["에세이", ""], "사이언스?": ["에세이", "과학 에세이"], "천공의 벌": ["소설", "미스터리"], "나미야 잡화점의 기적": ["소설", "판타지"], "인어가 잠든 집": ["소설", "미스터리"], "편지": ["소설", ""], "기린의 날개": ["소설", "미스터리"], "듣기의 철학": ["인문", "철학"], "삶은 여전히 빛난다": ["인문", "철학"], "오십이 철학을 마주할 때": ["인문", "철학"], "알고리즘으로 철학하기": ["인문", "철학"], "철학의 기쁨": ["인문", "철학"], "인생은 개처럼 사는 편이 좋다": ["인문", "철학"], "믿을 수 있을 만큼의 진실": ["소설", "단편집"], "불필요한 여자": ["소설", "레바논"], "일터에 관한 낯선 시선": ["인문", "일과 직업"], "중독은 뇌를 어떻게 바꾸는가": ["인문", "심리"], "소멸하지 않는 도시": ["사회·문화", "도시"], "어느 서민 여성의 삶, 노년, 죽음": ["사회·문화", "사회학적 전기"], "자연은 포기하지 않는다": ["과학", "생태"], "청소의 과학": ["과학", "생활 과학"], "홍학의 자리": ["소설", "미스터리"], "7년의 밤": ["소설", "스릴러"], "빅터 프랭클의 죽음의 수용소에서": ["인문", "심리"], "내가 틀릴 수도 있습니다": ["에세이", ""], "내면소통": ["인문", "심리"], "훌훌": ["소설", "청소년소설"], "오백 년째 열다섯": ["소설", "청소년 판타지"], "아몬드": ["소설", "청소년소설"], "화분 텃밭": ["요리·생활", "원예"], "정원의 쓸모": ["인문", "원예·치유"], "나만의 텃밭 가꾸기": ["요리·생활", "원예"], "지구를 살리는 기발한 생각 10": ["사회·문화", "환경"], "옷을 사지 않기로 했습니다": ["사회·문화", "환경"], "1일 1쓰레기 1제로": ["요리·생활", "제로웨이스트"], "혼자 사는 사람들을 위한 주거 실험": ["사회·문화", "주거"], "필연적 혼자의 시대": ["사회·문화", ""], "고립의 시대": ["사회·문화", ""], "외로움의 습격": ["사회·문화", ""], "우리는 다시 연결되어야 한다": ["사회·문화", "외로움"], "집이 아니라 방에 삽니다": ["사회·문화", "주거"], "환경과 생태 쫌 아는 10대": ["과학", "환경(청소년)"], "쓰레기책": ["사회·문화", "환경"], "왜요, 기후가 어떤데요?": ["과학", "기후(청소년)"], "기후위기인간": ["에세이", "만화 에세이"], "지구를 살리는 옷장": ["사회·문화", "환경"], "기후미식": ["요리·생활", "기후"], "유럽 축구 여행": ["여행", "축구"], "모든 것은 기본에서 시작한다": ["에세이", ""], "축구가 10배 더 재밌어지는 경기 관전법": ["취미·스포츠", ""], "내 아이가 축구를 한다면 꼭 전해 주고 싶은 이야기": ["취미·스포츠", ""], "닥터풋볼": ["취미·스포츠", ""], "축구를 하며 생각한 것들": ["에세이", ""], "오늘부터 실패하지 않게 일하는 법": ["경제·경영", "일하는 법"], "(일하면서 바로 써먹는) 아웃풋×성과 도감": ["경제·경영", "일하는 법"], "진정한 나의 일을 찾아서": ["경제·경영", "진로"], "커넥팅": ["경제·경영", ""], "퇴근길의 마음": ["에세이", ""], "가짜 노동": ["사회·문화", "노동"]};
+const GENRES=["소설","시","에세이","인문","역사","사회·문화","과학","예술","경제·경영","여행","요리·생활","취미·스포츠","책·독서"];
+const KINDS = {"전체":null,"국립":"국립","시·도 대표도서관":"광역대표","지역 공공도서관":"지역"};
+const RANK={"국립":0,"광역대표":1,"지역":2};
+const LIBFIRST=l=>l==="국립중앙도서관"?0:1;
+const curOrder=(A,B)=>B.month.localeCompare(A.month)||RANK[A.kind]-RANK[B.kind]||LIBFIRST(A.lib)-LIBFIRST(B.lib);
+const LAST_UPDATE="2026-11-10";
+const isNew=c=>c.added===LAST_UPDATE;
+{const [y,m,d]=LAST_UPDATE.split("-");const el=document.getElementById("lastUpd");if(el)el.textContent=`${y}. ${+m}. ${+d}.`;}
+CUR.sort(curOrder);
+const KIND_LABEL = {"국립":"국립","광역대표":"시·도 대표","지역":"지역"};
+const AUD_LABEL = {"성인":"성인","전연령":"전 연령","어린이":"어린이","초등저":"초등 저학년","초등고":"초등 고학년","유아":"유아","청소년":"청소년"};
+
+// flatten
+const norm = s => s.replace(/[\s()·,.:?!\-–—『』「」]/g,"").toLowerCase();
+const ROWS=[]; CUR.forEach(c=>c.books.forEach(b=>ROWS.push({c,genre:(GENRE[b[0]]||["",""])[0],gsub:(GENRE[b[0]]||["",""])[1],title:b[0],author:b[1],pub:b[2],year:b[3],field:b[4]||"",sub:b[5]||""})));
+const counter={}; ROWS.forEach(r=>{const k=norm(r.title);(counter[k]=counter[k]||new Set()).add(r.c.lib)});
+
+const $=id=>document.getElementById(id);
+let state={q:"",genre:"",kind:"전체",region:"",lib:"",month:"",view:"card"};
+try{const s=JSON.parse(localStorage.getItem("lp-state2")||"null");if(s)state=Object.assign(state,s)}catch(e){}
+
+// controls
+Object.keys(KINDS).forEach(k=>{const b=document.createElement("button");b.className="chip";b.textContent=k;b.onclick=()=>{state.kind=k;render()};b.dataset.k=k;$("kindChips").appendChild(b)});
+$("genre").innerHTML='<option value="">모든 장르</option>'+GENRES.map(g=>`<option>${g}</option>`).join("");$("genre").value=state.genre;$("genre").onchange=e=>{state.genre=e.target.value;render()};
+const regions=[...new Set(CUR.map(c=>c.region.split(" ")[0]))];
+$("region").innerHTML='<option value="">모든 지역</option>'+regions.map(r=>`<option>${r}</option>`).join("");
+$("region").value=state.region;$("region").onchange=e=>{state.region=e.target.value;render()};
+const libs=[...new Set(CUR.map(c=>c.lib))];
+$("lib").innerHTML='<option value="">모든 도서관</option>'+libs.map(l=>`<option>${l}</option>`).join("");
+const months=[...new Set(CUR.map(c=>c.month))].sort().reverse();
+$("month").innerHTML='<option value="">모든 달</option>'+months.map(m=>`<option value="${m}">${m.slice(0,4)}년 ${+m.slice(5)}월</option>`).join("");
+$("q").value=state.q;$("lib").value=state.lib;$("month").value=state.month;
+$("q").oninput=e=>{state.q=e.target.value;render()};
+$("lib").onchange=e=>{state.lib=e.target.value;render()};
+$("month").onchange=e=>{state.month=e.target.value;render()};
+$("vCard").onclick=()=>{state.view="card";render()};
+$("vTable").onclick=()=>{state.view="table";render()};
+
+// stats + sources
+const uniq=new Set(ROWS.map(r=>norm(r.title))).size;
+const kc=k=>new Set(CUR.filter(c=>c.kind===k).map(c=>c.lib)).size;
+$("stats").innerHTML=[["도서관 (국립 "+kc("국립")+" · 시·도 대표 "+kc("광역대표")+" · 지역 "+kc("지역")+")",libs.length],["큐레이션",CUR.length],["추천 도서(중복 제외)",uniq],["여러 곳 추천",Object.values(counter).filter(s=>s.size>1).length]].map(([k,v])=>`<div class="stat"><b>${v}</b><span>${k}</span></div>`).join("");
+$("srcList").innerHTML=CUR.map(c=>`<li>${c.lib} · ${c.theme} — <a href="${c.url}" target="_blank" rel="noopener">${c.urlLabel}</a></li>`).join("")+
+ `<li>지역 도서관 목록 수집 경로: <a href="https://www.mcst.go.kr/slibrary/program/books" target="_blank" rel="noopener">문화체육관광부 작은도서관 통합홈페이지 · 추천도서</a></li>`;
+
+const esc=s=>String(s).replace(/[&<>"]/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
+function match(r){
+  const g=KINDS[state.kind];
+  if(g && r.c.kind!==g) return false;
+  if(state.genre && r.genre!==state.genre) return false;
+  if(state.region && r.c.region.split(" ")[0]!==state.region) return false;
+  if(state.lib && r.c.lib!==state.lib) return false;
+  if(state.month && r.c.month!==state.month) return false;
+  if(state.q){const q=state.q.toLowerCase();if(![r.title,r.sub,r.genre,r.gsub,r.author,r.pub,r.c.theme,r.c.lib,r.field,r.genre,r.gsub].join(" ").toLowerCase().includes(q))return false}
+  return true;
+}
+function dupBadge(r){const s=counter[norm(r.title)];return s.size>1?`<span class="dup" title="${esc([...s].join(", "))}">${s.size}곳 추천</span>`:""}
+let lastRows=[];
+function render(){
+  const cm=document.getElementById("copyMsg");if(cm)cm.textContent="";const cb=document.getElementById("copyBox");if(cb)cb.hidden=true;
+  try{localStorage.setItem("lp-state2",JSON.stringify(state))}catch(e){}
+  document.querySelectorAll("#kindChips .chip").forEach(b=>b.setAttribute("aria-pressed",b.dataset.k===state.kind));
+  $("vCard").setAttribute("aria-pressed",state.view==="card");$("vTable").setAttribute("aria-pressed",state.view==="table");
+  const rows=ROWS.filter(match); lastRows=rows;
+  const gc={};rows.forEach(r=>gc[r.genre]=(gc[r.genre]||0)+1);$("count").textContent=`${rows.length}권 표시 중 · `+GENRES.filter(g=>gc[g]).map(g=>`${g} ${gc[g]}`).join(" · ");
+  if(!rows.length){$("out").innerHTML='<div class="empty">조건에 맞는 책이 없습니다.</div>';return}
+  if(state.view==="card"){
+    const byCur=new Map(); rows.forEach(r=>{if(!byCur.has(r.c.id))byCur.set(r.c.id,[]);byCur.get(r.c.id).push(r)});
+    const order=[...byCur.keys()].sort((a,b)=>{const A=CUR.find(c=>c.id===a),B=CUR.find(c=>c.id===b);return curOrder(A,B)});
+    $("out").innerHTML=order.map(id=>{const c=CUR.find(x=>x.id===id);return `<section class="cur">
+      <div class="cur-head">${isNew(c)?'<span class="new">NEW</span>':""}<h2>${esc(c.lib)}</h2><span class="tag">${c.month.slice(0,4)}.${c.month.slice(5)}</span><span class="tag aud">${KIND_LABEL[c.kind]}</span>${c.aud==="전연령"?'<span class="tag">전 연령 혼합</span>':""}<span class="meta">${esc(c.region)} · ${esc(c.theme)}</span>
+      <a href="${c.url}" target="_blank" rel="noopener">${esc(c.urlLabel)} ↗</a></div>
+      <div class="books">${byCur.get(id).map(r=>`<div class="book">${coverHtml(r)}<div class="bi"><div class="t">${esc(r.title)}${r.sub?`<small>${esc(r.sub)}</small>`:""}</div>
+      <div class="a">${esc(r.author)} · ${esc(r.pub)}${r.year?" · "+r.year:""}</div>
+      <div class="x"><span class="tag g">${esc(r.genre)}${r.gsub?" · "+esc(r.gsub):""}</span>${r.field?`<span class="tag">${esc(r.field)}</span>`:""}${dupBadge(r)}</div></div></div>`).join("")}</div></section>`}).join("");
+  }else{
+    $("out").innerHTML=`<div class="tablewrap"><table><thead><tr><th>서명</th><th>장르</th><th>저자</th><th>출판사</th><th>연도</th><th>유형</th><th>도서관</th><th>추천 월</th><th>분야·주제</th></tr></thead><tbody>${
+      rows.map(r=>`<tr><td class="title">${esc(r.title)} ${dupBadge(r)}</td><td>${esc(r.genre)}${r.gsub?" · "+esc(r.gsub):""}</td><td>${esc(r.author)}</td><td>${esc(r.pub)}</td><td>${r.year}</td><td>${KIND_LABEL[r.c.kind]}</td><td>${isNew(r.c)?'<span class="new">NEW</span> ':""}<a href="${r.c.url}" target="_blank" rel="noopener">${esc(r.c.lib)}</a></td><td>${r.c.month}</td><td>${esc(r.field||r.c.theme)}</td></tr>`).join("")}</tbody></table></div>`;
+  }
+}
+$("copyBtn").onclick=async()=>{
+  const clean=v=>String(v??"").replace(/[\t\r\n]+/g," ");
+  const tsv=["서명\t부제\t장르\t세부\t저자\t출판사\t연도\t유형\t도서관\t지역\t추천월\t큐레이션 주제\t원문 링크"].concat(lastRows.map(r=>[r.title,r.sub,r.genre,r.gsub,r.author,r.pub,r.year,KIND_LABEL[r.c.kind],r.c.lib,r.c.region,r.c.month,r.c.theme,r.c.url].map(clean).join("\t"))).join("\n");
+  $("copyBox").hidden=true;
+  try{await navigator.clipboard.writeText(tsv);$("copyMsg").textContent=`${lastRows.length}권을 복사했습니다. 엑셀이나 구글 시트의 첫 칸(A1)을 클릭하고 붙여넣으세요(Ctrl+V / ⌘+V). 지금 걸러 본 목록만 복사됩니다.`;return}catch(e){}
+  const ta=$("copyArea");ta.value=tsv;$("copyBox").hidden=false;ta.focus();ta.select();
+  let ok=false;try{ok=document.execCommand("copy")}catch(e){}
+  $("copyMsg").textContent=ok?`${lastRows.length}권을 복사했습니다. 엑셀 첫 칸에 붙여넣으세요.`:"";
+  if(ok)$("copyBox").hidden=true;
+};
+(()=>{const u=["1223","librarian"].join(""),d=["gmail","com"].join("."),addr=u+"@"+d,subj=encodeURIComponent("[사서추천도서 성인편] 문의");
+const menu=document.createElement("div");menu.className="mailmenu";menu.hidden=true;
+menu.innerHTML=`<a target="_blank" rel="noopener" href="https://mail.google.com/mail/?view=cm&fs=1&to=${addr}&su=${subj}">Gmail로 메일 쓰기</a><a href="mailto:${addr}?subject=${subj}">메일 앱으로 보내기</a><button type="button" class="mm-copy">메일 주소 복사</button><span class="mm-msg"></span>`;
+document.body.appendChild(menu);
+menu.querySelector(".mm-copy").onclick=async()=>{const m=menu.querySelector(".mm-msg");try{await navigator.clipboard.writeText(addr);m.textContent="복사했습니다. 메일 받는 사람 칸에 붙여넣으세요."}catch(e){m.textContent="복사가 막혔습니다. 위의 Gmail 링크를 이용해 주세요."}};
+document.querySelectorAll("a.mail").forEach(a=>a.addEventListener("click",e=>{e.preventDefault();e.stopPropagation();if(!menu.hidden&&menu._a===a){menu.hidden=true;return}menu._a=a;menu.querySelector(".mm-msg").textContent="";const r=a.getBoundingClientRect();menu.style.top=(window.scrollY+r.bottom+6)+"px";menu.style.left=Math.max(8,Math.min(window.scrollX+r.left,window.scrollX+document.documentElement.clientWidth-250))+"px";menu.hidden=false;}));
+document.addEventListener("click",e=>{if(!menu.hidden&&!menu.contains(e.target))menu.hidden=true});})();
+$("copyClose").onclick=()=>{$("copyBox").hidden=true};
+// 표지: GitHub Actions가 알라딘 OpenAPI로 찾아 covers.json에 저장해 둔 주소를 씁니다.
+// 열쇠는 scripts/covers.mjs의 coverKey와 똑같아야 합니다(서명 + 출판사, norm 적용).
+let COVERS={};
+const coverKey=r=>norm(String(r.title).split(/\s*[:：]\s*/)[0])+"|"+norm(r.pub||"");
+function coverHtml(r){
+  const c=COVERS[coverKey(r)];
+  if(!c||!/^https:\/\/image\.aladin\.co\.kr\//.test(c.cover||""))return '<span class="cv nocv" aria-hidden="true"></span>';
+  const link=/^https:\/\/www\.aladin\.co\.kr\//.test(c.link||"")?c.link:"https://www.aladin.co.kr";
+  return `<a class="cv" href="${esc(link)}" target="_blank" rel="noopener" title="알라딘에서 『${esc(r.title)}』 보기"><img src="${esc(c.cover)}" alt="『${esc(r.title)}』 표지" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.className='cv nocv';this.remove()"></a>`;
+}
+fetch("covers.json",{cache:"no-cache"}).then(res=>res.ok?res.json():null).then(d=>{if(d&&d.items){COVERS=d.items;render()}}).catch(()=>{});
+
+$("xlsxBtn").onclick=async()=>{
+  const btn=$("xlsxBtn");btn.disabled=true;const old=btn.textContent;btn.textContent="파일 만드는 중…";
+  try{
+    if(!window.XLSX){await new Promise((ok,no)=>{const sc=document.createElement("script");sc.src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js";sc.onload=ok;sc.onerror=no;document.head.appendChild(sc)})}
+    const head=["서명","부제","장르","세부","저자","출판사","연도","유형","도서관","지역","추천월","큐레이션 주제","원문 링크"];
+    const rows=lastRows.map(r=>[r.title,r.sub,r.genre,r.gsub,r.author,r.pub,r.year,KIND_LABEL[r.c.kind],r.c.lib,r.c.region,r.c.month,r.c.theme,r.c.url]);
+    const ws=XLSX.utils.aoa_to_sheet([head,...rows]);
+    ws["!cols"]=[{wch:30},{wch:24},{wch:10},{wch:12},{wch:22},{wch:14},{wch:6},{wch:10},{wch:18},{wch:10},{wch:9},{wch:30},{wch:40}];
+    const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"사서추천도서");
+    const d=new Date(),ymd=`${d.getFullYear()}${String(d.getMonth()+1).padStart(2,"0")}${String(d.getDate()).padStart(2,"0")}`;
+    XLSX.writeFile(wb,`사서추천도서_성인편_${ymd}.xlsx`);
+    $("copyMsg").textContent=`${lastRows.length}권을 엑셀 파일로 저장했습니다. 지금 걸러 본 목록만 들어갑니다.`;
+  }catch(e){
+    $("copyMsg").textContent="엑셀 파일을 만들지 못했습니다. 옆의 「엑셀용으로 목록 복사」를 이용해 주세요.";
+  }finally{btn.disabled=false;btn.textContent=old}
+};
+render();
+</script>
+</body>
+</html>
