@@ -14,6 +14,7 @@ const CERT_KEY = (process.env.NL_CERT_KEY || '').trim();
 const SOURCE = '국립중앙도서관 ISBN 서지정보 API';
 const MAX_CALLS = Number(process.env.MAX_CALLS || 1500);
 const RETRY_MISS_DAYS = 30;
+const SCRIPT_VERSION = 2; // 바꾸면 '못 찾은 책'을 모두 다시 조회
 
 // ── 페이지와 똑같은 정규화 (adult/index.html의 norm, coverKey와 반드시 같아야 함) ──
 const norm = (s) => String(s).replace(/[\s()·,.:?!\-–—『』「」]/g, '').toLowerCase();
@@ -93,6 +94,17 @@ function normalizeCoverUrl(u) {
   return /^https:\/\/[a-z0-9.-]*nl\.go\.kr\//i.test(s) ? s : '';
 }
 
+function diagnose(book, docs) {
+  const want = norm(mainTitle(book.title));
+  if (!docs.length) return '검색 결과 없음';
+  const sameTitle = docs.filter((d) => apiMain(d.TITLE) === want);
+  if (!sameTitle.length) return `서명 불일치(예: ${docs.slice(0, 2).map((d) => d.TITLE).join(' / ')})`;
+  const samePub = book.pub ? sameTitle.filter((d) => samePublisher(book.pub, d.PUBLISHER)) : sameTitle;
+  if (!samePub.length) return `출판사 불일치(예: ${sameTitle.slice(0, 2).map((d) => d.PUBLISHER).join(' / ')})`;
+  if (!samePub.some((d) => normalizeCoverUrl(d.TITLE_URL))) return '표지 이미지 미등록';
+  return '저자 불일치';
+}
+
 function pickMatch(book, docs) {
   const want = norm(mainTitle(book.title));
   const withCover = docs.filter((d) => normalizeCoverUrl(d.TITLE_URL));
@@ -132,6 +144,7 @@ async function main() {
   let prev = { items: {}, misses: {} };
   try { prev = JSON.parse(await readFile(OUT, 'utf8')); } catch {}
   if (prev.source !== SOURCE) prev = { items: {}, misses: {} }; // 출처가 바뀌면 처음부터 다시 찾기
+  if (prev.version !== SCRIPT_VERSION) prev.misses = {}; // 스크립트가 바뀌면 못 찾은 책 다시 조회
 
   const items = {}, misses = {};
   const now = Date.now();
@@ -145,11 +158,12 @@ async function main() {
     if (calls >= MAX_CALLS) { if (pm) misses[key] = pm; continue; }
     try {
       calls++;
-      const hit = pickMatch(book, await searchNl(book));
+      const docs = await searchNl(book);
+      const hit = pickMatch(book, docs);
       if (hit) { items[key] = hit; found++; }
       else {
-        misses[key] = { title: book.title, pub: book.pub, checkedAt: new Date().toISOString() };
-        missList.push(`${book.title} (${book.pub || '출판사 없음'})`);
+        misses[key] = { title: book.title, pub: book.pub, reason: diagnose(book, docs), checkedAt: new Date().toISOString() };
+        missList.push(`${book.title} (${book.pub || '출판사 없음'}) — ${misses[key].reason}`);
       }
     } catch (err) {
       errors++;
@@ -169,6 +183,7 @@ async function main() {
   const out = {
     updatedAt: new Date().toISOString(),
     source: SOURCE,
+    version: SCRIPT_VERSION,
     sourceUrl: 'https://www.nl.go.kr/seoji/',
     note: '서명이 같고 출판사(출판사가 없으면 첫 저자)가 일치하는 책만 표지를 붙였습니다.',
     items,
