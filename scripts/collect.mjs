@@ -17,6 +17,8 @@ const SEOUL_KEY = (process.env.SEOUL_KEY || '').trim();
 // 공식 API가 아닌 사이트(allgongyeon.com, 구글 뉴스 RSS)까지 긁어올지 여부.
 // 이용약관 문제가 걱정되면 저장소 Variables에 ENABLE_SCRAPING=false 로 꺼 둘 수 있습니다.
 const ENABLE_SCRAPING = (process.env.ENABLE_SCRAPING || 'true').toLowerCase() !== 'false';
+// 도서관 누리집 화면·뉴스 RSS 긁어오기(정확성이 낮아 기본 끔). 켜려면 ENABLE_LIBRARY_PAGES=true
+const ENABLE_LIBRARY_PAGES = (process.env.ENABLE_LIBRARY_PAGES || 'false').toLowerCase() === 'true';
 
 const PALETTES = { length: 6 }; // 파서가 paletteIdx 계산에 길이만 씁니다.
 const FETCH_TIMEOUT_MS = 25000;
@@ -397,7 +399,7 @@ function extractDatePairFromText(text) {
     const y1 = single[1];
     const m1 = single[2].padStart(2, '0');
     const d1 = single[3].padStart(2, '0');
-    const dt = new Date(Number(y1), Number(m1) - 1, Number(d1) + 14);
+    const dt = new Date(Number(y1), Number(m1) - 1, Number(d1)); // [수정] 끝날짜를 지어내지 않음
     const y2 = dt.getFullYear();
     const m2 = String(dt.getMonth() + 1).padStart(2, '0');
     const d2 = String(dt.getDate()).padStart(2, '0');
@@ -408,7 +410,7 @@ function extractDatePairFromText(text) {
     const year = new Date().getFullYear();
     const m1 = md[1].padStart(2, '0');
     const d1 = md[2].padStart(2, '0');
-    const dt = new Date(year, Number(m1) - 1, Number(d1) + 14);
+    const dt = new Date(year, Number(m1) - 1, Number(d1)); // [수정] 끝날짜를 지어내지 않음
     const y2 = dt.getFullYear();
     const m2 = String(dt.getMonth() + 1).padStart(2, '0');
     const d2 = String(dt.getDate()).padStart(2, '0');
@@ -615,7 +617,8 @@ function buildJobs() {
               title,
               venue: place || '서울 공공도서관',
               region: '서울',
-              genre: '도서관/강연',
+              // [수정] 도서관이 여는 행사이거나 북토크·작가 만남일 때만 '도서관/강연'. 문화재단 낭독극·공연 등은 원래 분류로
+              genre: (/도서관/.test(`${row.ORG_NAME || ''} ${(title.match(/^\[[^\]]+\]/) || [''])[0]}`) || /북토크|북콘서트|작가와의|작가\s*만남|저자/.test(title)) ? '도서관/강연' : inferGenreFromText(`${codename} ${title}`),
               startDate: sRaw,
               endDate: /^\d{4}-\d{2}-\d{2}$/.test(eRaw) ? eRaw : sRaw,
               price: row.USE_FEE || (row.IS_FREE === '무료' ? '무료' : '기관 누리집 확인'),
@@ -712,7 +715,10 @@ function buildJobs() {
     { key: 'daegu-lib', url: 'https://library.daegu.go.kr/jungang/module/teach/index.do?menu_idx=15', venue: '대구광역시립중앙도서관', region: '경상' },
     { key: 'jeonju-lib', url: 'https://lib.jeonju.go.kr/', venue: '전주시립도서관', region: '전라' }
   ];
-  libraryPortals.forEach((portal) => {
+  // [수정] 도서관 누리집 일반 수집은 기본으로 끈다. 누리집 화면에서 제목·날짜를 기계적으로 뽑으면
+  // '접수마감', '본문 바로가기' 같은 버튼 글자가 제목으로 들어가고, 접수 기간이 행사 날짜로 들어가는 등
+  // 정확성을 보장할 수 없었다. 날짜·제목이 정해진 칸으로 오는 공식 API(KOPIS·서울 열린데이터·문화포털)만 쓴다.
+  if (ENABLE_LIBRARY_PAGES) libraryPortals.forEach((portal) => {
     jobs.push({
       source: '도서관 누리집',
       name: portal.venue + (portal.key.match(/-p\d|-pi\d/) ? ` (${portal.key})` : ''),
@@ -743,8 +749,8 @@ function buildJobs() {
       });
     });
 
-    // F. 구글 뉴스 RSS (공식 API 아님)
-    [
+    // F. 구글 뉴스 RSS (공식 API 아님) — [수정] 기사 문장에서 행사명·날짜를 정확히 뽑을 수 없어 기본으로 끔
+    if (ENABLE_LIBRARY_PAGES) [
       '경기도서관 프로그램 OR 강연 OR 북토크 OR 전시',
       '수원 OR 성남 OR 고양 OR 용인 OR 평택 도서관 강연 OR 북토크',
       '부천 OR 안산 OR 화성 OR 파주 OR 인천 도서관 강연 OR 북토크',
@@ -845,7 +851,8 @@ async function main() {
 
   // 이번에 한 건도 못 가져온 출처는 지난번 데이터를 그대로 이어서 씁니다.
   const previous = await readPrevious();
-  const carried = previous.filter((ev) => ev._source && !okSources.has(ev._source));
+  const attempted = new Set(jobs.map((j) => j.source));
+  const carried = previous.filter((ev) => ev._source && attempted.has(ev._source) && !okSources.has(ev._source));
 
   const dropped = { noDate: 0, ended: 0, pastYear: 0 };
   const thisYear = Number(today.slice(0, 4));
