@@ -64,7 +64,7 @@
     .ev-h1{font-family:"Noto Serif KR",serif;font-size:clamp(1.55rem,3.2vw,2.15rem);font-weight:700;letter-spacing:-.01em;margin:0 0 6px;color:#14243a;word-break:keep-all;line-height:1.55}
     .ev-h1 small{font-size:.55em;color:#5a6b80;font-weight:600;letter-spacing:0;display:inline-block}
     .ev-byline{margin:0 0 10px;font-size:13.5px;color:#5a6b80}
-    .ev-lede{margin:0;color:#5a6b80;font-size:15px;line-height:1.55;max-width:820px;word-break:keep-all;font-family:"Noto Sans KR",system-ui,sans-serif}
+    .ev-lede{margin:0;color:#5a6b80;font-size:15px;line-height:1.55;word-break:keep-all;font-family:"Noto Sans KR",system-ui,sans-serif}
     .ev-meta{margin:8px 0 0;font-size:.86rem;color:#5a6b80;font-family:"Noto Sans KR",system-ui,sans-serif}
     .ev-byline{font-family:"Noto Sans KR",system-ui,sans-serif}
     a.author{color:#1f4e8c;font-weight:700;text-decoration:none;border-bottom:1px dashed currentColor}
@@ -82,22 +82,23 @@
       scrollbar-width: none;
     }
   </style>
+<style>/* 세 페이지 공통 폭: 문화행사 기준 1280px, 좌우 여백 휴대폰 16px · 그 이상 24px */@media (min-width:640px){.hb-nav .hb-in{padding-left:24px;padding-right:24px}}</style>
 </head>
 <body class="min-h-screen flex flex-col">
 <!-- HANA된 책과 문화 공통 메뉴 (세 페이지 공통, 지우지 마세요) -->
-<style>.hb-nav{background:#14243a;color:#fff;font-family:"Noto Sans KR",system-ui,sans-serif;font-size:14px;line-height:1.4}.hb-in{max-width:1180px;margin:0 auto;padding:8px 20px;display:flex;align-items:center;gap:6px 16px;flex-wrap:wrap}.hb-brand{font-weight:800;letter-spacing:-.2px;white-space:nowrap;color:#fff}.hb-brand b{color:#7fd3c4}.hb-tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}.hb-tabs::-webkit-scrollbar{display:none}.hb-tab{white-space:nowrap;padding:5px 12px;border-radius:999px;color:#c9d6e6;text-decoration:none;font-weight:500}a.hb-tab:hover{background:rgba(255,255,255,.1);color:#fff}.hb-on{background:#fff;color:#14243a;font-weight:700}@media (min-width:1024px){.hb-nav{font-size:15px}.hb-in{padding-top:10px;padding-bottom:10px}.hb-brand{font-size:16px}.hb-tab{padding:6px 15px}}@media (min-width:640px){.hb-in{max-width:1280px;padding-left:24px;padding-right:24px}}@media (max-width:560px){.hb-in{padding:7px 12px}.hb-tab{padding:5px 10px;font-size:13px}}</style>
+<style>.hb-nav{background:#14243a;color:#fff;font-family:"Noto Sans KR",system-ui,sans-serif;font-size:14px;line-height:1.4}.hb-in{max-width:1280px;margin:0 auto;padding:8px 16px;display:flex;align-items:center;gap:6px 16px;flex-wrap:wrap}.hb-brand{font-weight:800;letter-spacing:-.2px;white-space:nowrap;color:#fff}.hb-brand b{color:#7fd3c4}.hb-tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}.hb-tabs::-webkit-scrollbar{display:none}.hb-tab{white-space:nowrap;padding:5px 12px;border-radius:999px;color:#c9d6e6;text-decoration:none;font-weight:500}a.hb-tab:hover{background:rgba(255,255,255,.1);color:#fff}.hb-on{background:#fff;color:#14243a;font-weight:700}@media (min-width:1024px){.hb-nav{font-size:15px}.hb-in{padding-top:10px;padding-bottom:10px}.hb-brand{font-size:16px}.hb-tab{padding:6px 15px}}@media (max-width:560px){.hb-in{padding:7px 12px}.hb-tab{padding:5px 10px;font-size:13px}}</style>
 <nav class="hb-nav" aria-label="HANA된 책과 문화"><div class="hb-in"><span class="hb-brand">HANA<b>된 책과 문화</b></span><div class="hb-tabs"><span class="hb-tab hb-on" aria-current="page">문화행사</span><a class="hb-tab" href="kids/">교육청도서관 추천도서 · 유아~고등</a><a class="hb-tab" href="adult/">공공도서관 추천도서 · 성인</a></div></div></nav>
 
   <!-- 머리 영역 (추천도서 페이지와 같은 구성) -->
   <section class="ev-hero">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 pt-8 pb-7 sm:pt-10 sm:pb-8 flex flex-wrap items-end justify-between gap-5">
-      <div class="min-w-0">
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 pt-8 pb-7 sm:pt-10 sm:pb-8 flex flex-wrap items-end justify-between gap-5">
+      <div class="min-w-0 w-full">
         <h1 class="ev-h1"><span style="color:#1f4e8c">전국 문화행사</span> <span style="white-space:nowrap">한눈에 보기</span> <small>공연 · 전시 · 도서관 행사</small></h1>
         <p class="ev-byline">최초 제작 2026. 11. 13. · <span id="evUpdated">최종 업데이트 —</span> · 제작 <a class="author mail" href="#" title="제작자에게 메일 보내기">libraryviolin</a></p>
         <p class="ev-lede">전국 미술관 · 박물관 · 공연장 · 도서관의 공식 일정과 포스터를 한곳에 모았습니다. 지역과 장르로 걸러 보고, 카드를 누르면 자세한 정보와 원문 링크를 볼 수 있어요.</p>
         <p class="ev-meta">매일 새벽에 새로 올라온 일정을 반영해 업데이트됩니다.</p>
       </div>
-      <div class="flex flex-wrap items-center gap-2">
+      <div class="flex flex-wrap items-center gap-2 xl:absolute xl:right-6 xl:top-10">
         <button id="openPolicyModalBtn" type="button" class="px-3.5 py-2 rounded-xl text-sm font-bold bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 transition flex items-center gap-1.5">
           <span>📋</span>
           <span>운영 · 저작권 정책</span>
