@@ -787,7 +787,7 @@ const regions=[...new Set(CUR.map(c=>c.region.split(" ")[0]))];
 $("region").innerHTML='<option value="">모든 지역</option>'+regions.map(r=>`<option>${r}</option>`).join("");
 $("region").value=state.region;$("region").onchange=e=>{state.region=e.target.value;render()};
 const libs=[...new Set(CUR.map(c=>c.lib))];
-$("lib").innerHTML='<option value="">모든 도서관</option>'+libs.map(l=>`<option>${l}</option>`).join("");
+$("lib").innerHTML='<option value="">모든 도서관</option>'+[...libs].sort((a,b)=>a.localeCompare(b,"ko")).map(l=>`<option>${l}</option>`).join("");
 const months=[...new Set(CUR.map(c=>c.month))].sort().reverse();
 $("month").innerHTML='<option value="">모든 달</option>'+months.map(m=>`<option value="${m}">${m.slice(0,4)}년 ${+m.slice(5)}월</option>`).join("");
 $("q").value=state.q;$("lib").value=state.lib;$("month").value=state.month;
