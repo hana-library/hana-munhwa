@@ -1,14 +1,15 @@
-// 「전국 도서관 행사 지도」 페이지의 EVENTS·SRC를 문화행사 페이지용 library-events.json으로 바꿉니다.
-// 행사 지도는 매월 25일 갱신 작업이 출처를 하나씩 확인해 만든 자료이고,
+// data/library-events-source.html(도서관 행사 조사 원본, 옛 「전국 도서관 행사 지도」 형식)의 EVENTS·SRC를 문화행사 페이지용 library-events.json으로 바꿉니다.
+// 행사 지도는 주 1회 조사 작업이 출처를 하나씩 확인해 만든 자료이고,
 // 문화행사 페이지(index.html)는 이 파일을 '도서관/강연' 장르로 함께 보여 줍니다.
 //
-// 실행: node scripts/map-to-json.mjs <행사 지도 index.html 경로>
+// 실행: node scripts/map-to-json.mjs  (인자 없으면 data/library-events-source.html)
 
 import { readFile, writeFile } from 'node:fs/promises';
 import vm from 'node:vm';
 
 const OUT = new URL('../library-events.json', import.meta.url);
-const MAP_URL = 'https://claude.ai/artifact/EnrKkZqRtL1pxyFC8FXxwF';
+const MAP_URL = ''; // 행사 지도 아티팩트는 더 갱신하지 않음(2026-11-19). 원문 링크가 없는 행사는 빈칸.
+const DEFAULT_SRC = new URL('../data/library-events-source.html', import.meta.url);
 
 // 행사 지도 지역(16개 시·도) → 문화행사 페이지 권역
 const REGION = {
@@ -38,8 +39,8 @@ function grab(src, name) {
 const todayKST = () => new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);
 
 async function main() {
-  const path = process.argv[2];
-  if (!path) throw new Error('사용법: node scripts/map-to-json.mjs <행사 지도 index.html>');
+  const path = process.argv[2] || DEFAULT_SRC;
+
   const html = await readFile(path, 'utf8');
   const SRC = grab(html, 'SRC');
   const EVENTS = grab(html, 'EVENTS');
@@ -85,7 +86,7 @@ async function main() {
   await writeFile(OUT, JSON.stringify({
     updatedAt: new Date().toISOString(),
     surveyedAt: asof || null,
-    source: '전국 도서관 행사 지도(libraryviolin, 매월 25일 갱신)',
+    source: '도서관 행사 조사(libraryviolin, 주 1회 갱신)',
     sourceUrl: MAP_URL,
     count: out.length,
     events: out

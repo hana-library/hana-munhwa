@@ -589,7 +589,7 @@
           const data = await res.json();
           let list = Array.isArray(data) ? data : Array.isArray(data?.events) ? data.events : [];
 
-          // 「전국 도서관 행사 지도」(매월 25일, 출처를 하나씩 확인한 도서관 행사)를 '도서관/강연'으로 함께 보여 줌.
+          // 주 1회 도서관 행사 조사(출처를 하나씩 확인한 도서관 행사, library-events.json)를 '도서관/강연'으로 함께 보여 줌.
           // 같은 행사가 두 곳에 있으면 행사 지도 쪽을 남기도록 먼저 넣는다.
           try {
             const lr = await fetch('./library-events.json', { cache: 'no-cache' });
