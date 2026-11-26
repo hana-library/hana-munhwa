@@ -16,7 +16,7 @@ const SEOUL_KEY = (process.env.SEOUL_KEY || '').trim();
 
 // 공식 API가 아닌 사이트(allgongyeon.com, 구글 뉴스 RSS)까지 긁어올지 여부.
 // 이용약관 문제가 걱정되면 저장소 Variables에 ENABLE_SCRAPING=false 로 꺼 둘 수 있습니다.
-const ENABLE_SCRAPING = (process.env.ENABLE_SCRAPING || 'true').toLowerCase() !== 'false';
+const ENABLE_SCRAPING = (process.env.ENABLE_SCRAPING || 'false').toLowerCase() === 'true'; // 기본 끔(2026-11-26)
 // 도서관 누리집 화면·뉴스 RSS 긁어오기(정확성이 낮아 기본 끔). 켜려면 ENABLE_LIBRARY_PAGES=true
 const ENABLE_LIBRARY_PAGES = (process.env.ENABLE_LIBRARY_PAGES || 'false').toLowerCase() === 'true';
 

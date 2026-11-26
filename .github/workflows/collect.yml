@@ -34,7 +34,7 @@ jobs:
           KOPIS_KEY: ${{ secrets.KOPIS_KEY }}
           CULTURE_KEY: ${{ secrets.CULTURE_KEY }}
           SEOUL_KEY: ${{ secrets.SEOUL_KEY }}
-          ENABLE_SCRAPING: ${{ vars.ENABLE_SCRAPING || 'true' }}
+          ENABLE_SCRAPING: 'false' # 민간 사이트(allgongyeon.com 등) 수집 중단(2026-11-26, 저작권·DB권 검토)
         run: npm run collect
 
       - name: 도서관 행사 지도 자료에서 끝난 행사 정리
